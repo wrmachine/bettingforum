@@ -1,0 +1,351 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
+  password      String?   // Optional for OAuth users (e.g. Google)
+  role          String    @default("user")
+  createdAt     DateTime  @default(now())
+
+  // Profile fields (completed after signup or via onboarding)
+  location      String?
+  avatarUrl     String?
+  bio           String?   // User description
+
+  // Email verification (for credentials signup)
+  emailVerified DateTime?
+  verificationToken   String?   @unique
+  verificationTokenExpires DateTime?
+
+  posts         Post[]
+  votes         Vote[]
+  comments      Comment[]
+  productReviews ProductReview[]
+}
+
+model Post {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  type       String   // product | listicle | thread | article | bonus
+  authorId   String
+  excerpt    String?
+  body       String?
+  forumSlug  String?  // e.g. bet-general — which forum this thread belongs to
+  status     String   @default("draft") // draft | published
+  promoted   Boolean  @default(false)   // admin-promoted (pinned on home)
+  createdAt  DateTime @default(now())
+
+  author   User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  product  Product?
+  listicle Listicle?
+  article  Article?
+  bonus    Bonus?
+  votes    Vote[]
+  comments Comment[]
+  postTags PostTag[]
+
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@index([type, promoted])
+}
+
+model Product {
+  id                  String   @id @default(cuid())
+  postId              String   @unique
+  brandName           String
+  siteUrl             String?
+  productType         String   // sportsbook | casino | crypto | tool | tipster
+  licenseJurisdiction String?
+  geoRestrictions     String?
+  fiatSupported       Boolean  @default(true)
+  cryptoSupported     Boolean  @default(false)
+  bonusSummary        String?
+  minDeposit          String?
+  shortDescription    String?  // Used in listicles; AI-generated blurb
+  logoUrl             String?  // Brand logo image URL
+  media               String?  // JSON: [{type:'screenshot'|'photo', url, alt?, caption?}]
+  bankingMethods      String?  // JSON: [{id, deposit?:{min,max,fee}, withdrawal?:{fee}}]
+  cryptoMethods       String?  // JSON: [{id, name?}] - e.g. [{id:'bitcoin'}, {id:'ethereum'}]
+  acceptedCurrencies  String?  // JSON: ['USD','EUR'] or comma-separated
+
+  post   Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reviews ProductReview[]
+  listicleItems ListicleItem[]
+  bonuses Bonus[]
+  discoveredBonuses DiscoveredBonus[]
+}
+
+model Bonus {
+  id          String    @id @default(cuid())
+  postId      String    @unique
+  productId   String?   // Optional: which sportsbook/casino offers this bonus
+  offerValue  String?   // e.g. "100% up to $500"
+  promoCode   String?
+  terms       String?   // T&C summary
+  claimUrl    String?   // Direct link to claim
+  expiresAt   DateTime?
+  featured    Boolean   @default(false) // Featured bonuses shown on top with Featured tag
+
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@index([featured])
+}
+
+// Bonus codes discovered by AI — admin selects which to publish
+model DiscoveredBonus {
+  id          String    @id @default(cuid())
+  productId   String
+  brandName   String    // Denormalized for display
+  offerValue  String?
+  promoCode   String?
+  terms       String?
+  claimUrl    String?
+  sourceUrl   String?   // Where we found it
+  rawSnippet  String?   // Original text Claude extracted from
+  bonusType   String?   // AI-assigned type slug: first-time, second-deposit, reload, no-deposit, free-spins, etc.
+  status      String    @default("pending") // pending | approved | rejected
+  createdAt   DateTime  @default(now())
+  approvedAt  DateTime?
+  rejectedAt  DateTime?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([status])
+}
+
+model ProductReview {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String
+  rating    Int
+  headline  String?
+  pros      String?
+  cons      String?
+  body      String?
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([productId])
+}
+
+model Listicle {
+  id           String  @id @default(cuid())
+  postId       String  @unique
+  titleOverride String?
+  intro        String?
+
+  post  Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  items ListicleItem[]
+}
+
+model Article {
+  id               String  @id @default(cuid())
+  postId           String  @unique
+  featuredImageUrl String?
+  subheadline      String?  // Newspaper-style subheadline
+  lead             String?  // Standfirst / lead paragraph (overrides excerpt for display)
+  factChecker      String?  // Name of fact checker
+  readTimeMinutes  Int?     // Estimated read time (computed if null)
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model ListicleItem {
+  id        String  @id @default(cuid())
+  listicleId String
+  productId  String
+  position   Int
+  note       String?
+
+  listicle Listicle @relation(fields: [listicleId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([listicleId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  value     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  parentId  String?
+  body      String
+  createdAt DateTime @default(now())
+
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+
+  postTags PostTag[]
+}
+
+model PostTag {
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([tagId])
+}
+
+// SEO Admin Models
+// Per-forum overrides for name and description (admin-editable)
+model ForumMeta {
+  id          String   @id @default(cuid())
+  slug        String   @unique // e.g. bet-general — matches ForumConfig slug
+  name        String?  // Override display title
+  description String? // Override description
+  updatedAt   DateTime @updatedAt
+}
+
+model SeoSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON string for complex values
+  updatedAt DateTime @updatedAt
+}
+
+model PageMeta {
+  id          String   @id @default(cuid())
+  pathPattern String   @unique // e.g. "/", "/products", "/products/*"
+  title       String?
+  description String?
+  ogTitle     String?
+  ogDescription String?
+  ogImage     String?
+  twitterCard String?  // summary | summary_large_image | app | player
+  noIndex     Boolean  @default(false)
+  noFollow    Boolean  @default(false)
+  canonical   String?
+  updatedAt   DateTime @updatedAt
+}
+
+model SitemapConfig {
+  id          String   @id @default(cuid())
+  pathPattern String   @unique
+  priority    Float    @default(0.5) // 0.0 - 1.0
+  changeFreq  String   @default("weekly") // always|hourly|daily|weekly|monthly|yearly|never
+  enabled     Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model SchemaConfig {
+  id        String   @id @default(cuid())
+  schemaType String  @unique // organization | website | breadcrumb | product | article | listicle
+  enabled   Boolean  @default(true)
+  config    String   // JSON for type-specific config
+  updatedAt DateTime @updatedAt
+}
+
+model StaticPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique // privacy, terms, about, contact, etc.
+  title     String
+  body      String   @default("") // Markdown
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model MenuItem {
+  id       String   @id @default(cuid())
+  label    String
+  href     String
+  order    Int      @default(0)
+  location String   // header_main | header_secondary | footer_services | footer_helpful | footer_information | footer_legal
+  parentId String?  // For dropdowns; null = top-level
+  parent   MenuItem?  @relation("MenuChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children MenuItem[] @relation("MenuChildren")
+
+  @@index([location])
+  @@index([parentId])
+}
+
+// Ad Management
+model AdSpace {
+  id        String   @id @default(cuid())
+  name      String   // e.g. "Footer Right"
+  slot      String   @unique // e.g. footer_right, sidebar_top (used in code)
+  width     Int      @default(300)
+  height    Int      @default(250)
+  rotation  String   @default("random") // random | round_robin | weighted
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ads Ad[]
+}
+
+model Ad {
+  id          String    @id @default(cuid())
+  adSpaceId   String
+  name        String
+  imageUrl    String
+  linkUrl     String
+  weight      Int       @default(1) // For weighted rotation (higher = more frequent)
+  active      Boolean   @default(true)
+  startDate   DateTime? // Optional campaign window
+  endDate     DateTime?
+  impressions Int       @default(0) // Cached count
+  clicks      Int       @default(0)  // Cached count
+  order       Int       @default(0)  // For round-robin ordering
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  adSpace  AdSpace   @relation(fields: [adSpaceId], references: [id], onDelete: Cascade)
+  adClicks AdClick[]
+
+  @@index([adSpaceId])
+  @@index([active])
+}
+
+model AdClick {
+  id        String   @id @default(cuid())
+  adId      String
+  clickedAt DateTime @default(now())
+  referrer  String?
+
+  ad Ad @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@index([adId])
+  @@index([clickedAt])
+}

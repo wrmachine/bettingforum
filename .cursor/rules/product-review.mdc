@@ -1,0 +1,17 @@
+---
+description: Product/sportsbook review structure, banking/crypto grids, and AI update API
+globs: "**/ProductDetail.tsx,**/BankingGrid.tsx,**/CryptoGrid.tsx,**/product-options.ts,**/api/products/**/*.ts"
+alwaysApply: false
+---
+
+# Product Review Structure
+
+When updating sportsbook/product review content:
+
+1. **Media**: `logoUrl`, `media` (JSON array of `{type, url, alt?, caption?}`)
+2. **Banking**: `bankingMethods` (JSON array). Use IDs from `BANKING_OPTIONS` in `src/lib/product-options.ts`: visa, mastercard, paypal, banktransfer, etc.
+3. **Crypto**: `cryptoMethods` (JSON array). Use IDs from `CRYPTO_OPTIONS`: bitcoin, ethereum, litecoin, usdt, etc.
+
+**API**: `PATCH /api/products/[id]` (admin only) accepts these fields as JSON strings.
+
+See `docs/PRODUCT_REVIEW_AI_GUIDE.md` for full schemas and examples.

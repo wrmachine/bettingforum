@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Override: no top padding for home, sportsbook, odds, bonus, calculator, and listicle sections */
+main:has([data-section="home"]),
+main:has([data-section="products"]),
+main:has([data-section="bonuses"]),
+main:has([data-section="calculators"]),
+main:has([data-section="listicles"]) {
+  padding-top: 0;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
