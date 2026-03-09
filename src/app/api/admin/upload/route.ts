@@ -38,8 +38,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ext = path.extname(file.name) || ".png";
-    const basename = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, "_");
+    // Use MIME type for extension - filenames often lack or have wrong extension
+    const mimeToExt: Record<string, string> = {
+      "image/jpeg": ".jpg",
+      "image/png": ".png",
+      "image/webp": ".webp",
+      "image/gif": ".gif",
+    };
+    const ext = mimeToExt[file.type] ?? path.extname(file.name) || ".png";
+    const basename = path.basename(file.name, path.extname(file.name)).replace(/[^a-zA-Z0-9_-]/g, "_");
     const filename = `${Date.now()}-${basename}${ext}`;
     const dir = path.join(process.cwd(), UPLOAD_DIR);
     const filepath = path.join(dir, filename);

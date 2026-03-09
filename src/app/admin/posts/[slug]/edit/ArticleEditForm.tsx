@@ -159,7 +159,11 @@ export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
                 <div className="shrink-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={featuredImageUrl}
+                    src={
+                      featuredImageUrl.startsWith("/") && typeof window !== "undefined"
+                        ? `${window.location.origin}${featuredImageUrl}`
+                        : featuredImageUrl
+                    }
                     alt="Featured"
                     className="h-24 w-24 rounded border border-slate-200 object-cover"
                   />
