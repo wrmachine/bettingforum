@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   BANKING_OPTIONS,
   CRYPTO_OPTIONS,
@@ -9,6 +9,7 @@ import {
   type BankingMethodEntry,
   type CryptoMethodEntry,
 } from "@/lib/product-options";
+import { ImageUploadZone } from "@/components/ImageUploadZone";
 import { ProductContentEditor } from "@/components/ProductContentEditor";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { PRODUCT_TYPES, parseProductTypes, serializeProductTypes } from "@/lib/product-types";
@@ -69,8 +70,6 @@ export function ProductEditForm({ product, post }: ProductEditFormProps) {
   const [postExcerpt, setPostExcerpt] = useState(post.excerpt ?? "");
 
   const [logoUrl, setLogoUrl] = useState(product.logoUrl ?? "");
-  const [logoUploading, setLogoUploading] = useState(false);
-  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(() => {
     if (!product.media?.trim()) return [];
@@ -81,8 +80,6 @@ export function ProductEditForm({ product, post }: ProductEditFormProps) {
       return [];
     }
   });
-  const [mediaUploading, setMediaUploading] = useState(false);
-  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   const [acceptedCurrencies, setAcceptedCurrencies] = useState(() => {
     if (!product.acceptedCurrencies?.trim()) return '["USD"]';
@@ -156,65 +153,22 @@ export function ProductEditForm({ product, post }: ProductEditFormProps) {
     }
   };
 
-  const uploadFile = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/admin/upload", {
-      method: "POST",
-      body: formData,
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error ?? "Upload failed");
-    }
-    const { url } = await res.json();
-    return url;
+  const handleLogoChange = (url: string) => {
+    setLogoUrl(url);
+    setMessage(url ? { type: "ok", text: "Logo updated." } : null);
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setLogoUploading(true);
-    try {
-      const url = await uploadFile(file);
-      setLogoUrl(url);
-      setMessage({ type: "ok", text: "Logo uploaded." });
-    } catch (err) {
-      setMessage({
-        type: "err",
-        text: err instanceof Error ? err.message : "Logo upload failed",
-      });
-    } finally {
-      setLogoUploading(false);
-      e.target.value = "";
-    }
-  };
-
-  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setMediaUploading(true);
-    try {
-      const url = await uploadFile(file);
-      setMediaItems((prev) => [
-        ...prev,
-        {
-          type: "screenshot",
-          url,
-          alt: file.name,
-          caption: "",
-        },
-      ]);
-      setMessage({ type: "ok", text: "Image added to media." });
-    } catch (err) {
-      setMessage({
-        type: "err",
-        text: err instanceof Error ? err.message : "Upload failed",
-      });
-    } finally {
-      setMediaUploading(false);
-      e.target.value = "";
-    }
+  const handleMediaUpload = (url: string, fileName?: string) => {
+    setMediaItems((prev) => [
+      ...prev,
+      {
+        type: "screenshot",
+        url,
+        alt: fileName ?? "",
+        caption: "",
+      },
+    ]);
+    setMessage({ type: "ok", text: "Image added to media." });
   };
 
   const removeMediaItem = (index: number) => {
@@ -456,43 +410,15 @@ export function ProductEditForm({ product, post }: ProductEditFormProps) {
       {/* Logo – upload + URL */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Logo</h2>
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
-          <div className="flex shrink-0 flex-col gap-2">
-            <input
-              ref={logoInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={handleLogoUpload}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => logoInputRef.current?.click()}
-              disabled={logoUploading}
-              className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
-            >
-              {logoUploading ? "Uploading…" : "Upload logo"}
-            </button>
-            {logoUrl && (
-              <div className="h-20 w-20 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
-                <img
-                  src={logoUrl}
-                  alt="Logo preview"
-                  className="h-full w-full object-contain"
-                />
-              </div>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <label className="block text-sm font-medium text-slate-700">Or paste image URL</label>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://example.com/logo.png"
-              className="mt-1 block w-full rounded border border-slate-300 px-3 py-2"
-            />
-          </div>
+        <div className="mt-4">
+          <ImageUploadZone
+            uploadEndpoint="/api/admin/upload"
+            value={logoUrl}
+            onChange={handleLogoChange}
+            label="Drop logo or click to upload"
+            allowUrlInput={true}
+            previewFit="contain"
+          />
         </div>
       </section>
 
@@ -583,31 +509,24 @@ export function ProductEditForm({ product, post }: ProductEditFormProps) {
       {/* Media – upload + list */}
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Media (screenshots, photos)</h2>
-        <input
-          ref={mediaInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          onChange={handleMediaUpload}
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => mediaInputRef.current?.click()}
-          disabled={mediaUploading}
-          className="mt-2 rounded-lg border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
-        >
-          {mediaUploading ? "Uploading…" : "Upload image"}
-        </button>
+        <div className="mt-2">
+          <ImageUploadZone
+            uploadEndpoint="/api/admin/upload"
+            onUpload={handleMediaUpload}
+            label="Drop images here or click to add"
+            allowUrlInput={false}
+          />
+        </div>
         <div className="mt-4 space-y-3">
           {mediaItems.map((item, i) => (
             <div
               key={i}
-              className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
+              className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-3 transition hover:border-slate-300"
             >
               <img
                 src={item.url}
                 alt={item.alt ?? ""}
-                className="h-16 w-24 shrink-0 rounded object-cover"
+                className="h-20 w-28 shrink-0 rounded-lg object-cover shadow-sm"
               />
               <div className="min-w-0 flex-1">
                 <input
@@ -619,22 +538,19 @@ export function ProductEditForm({ product, post }: ProductEditFormProps) {
                     setMediaItems(next);
                   }}
                   placeholder="Caption"
-                  className="block w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                  className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-felt focus:outline-none focus:ring-1 focus:ring-felt"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => removeMediaItem(i)}
-                className="shrink-0 text-red-600 hover:text-red-800"
+                className="shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
               >
                 Remove
               </button>
             </div>
           ))}
         </div>
-        {mediaItems.length === 0 && (
-          <p className="mt-2 text-sm text-slate-500">No media yet. Click Upload image to add.</p>
-        )}
       </section>
 
       {message && (

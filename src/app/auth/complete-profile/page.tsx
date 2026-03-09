@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -82,14 +82,22 @@ export default function CompleteProfilePage() {
     }
   };
 
+  // Give session time to hydrate after OAuth redirect (avoids "kicked to sign-in" race)
+  useEffect(() => {
+    if (status !== "unauthenticated") return;
+    const t = setTimeout(() => router.replace("/auth/sign-in"), 1500);
+    return () => clearTimeout(t);
+  }, [status, router]);
+
   if (status === "loading") {
     return (
       <div className="mx-auto max-w-md text-center py-12 text-gray-500">Loading...</div>
     );
   }
   if (status === "unauthenticated") {
-    router.replace("/auth/sign-in");
-    return null;
+    return (
+      <div className="mx-auto max-w-md text-center py-12 text-gray-500">Checking session...</div>
+    );
   }
 
   return (

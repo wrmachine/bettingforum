@@ -5,7 +5,8 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { Table, TableRow, TableCell, TableHeader } from "@tiptap/extension-table";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { ImageUploadZone } from "@/components/ImageUploadZone";
 
 interface ProductContentEditorProps {
   value: string;
@@ -23,8 +24,6 @@ export function ProductContentEditor({
   className = "",
 }: ProductContentEditorProps) {
   const [mounted, setMounted] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => setMounted(true), []);
 
   const editor = useEditor({
@@ -68,33 +67,6 @@ export function ProductContentEditor({
       editor.commands.setContent(incoming || "<p></p>", { emitUpdate: false });
     }
   }, [value, editor]);
-
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error ?? "Upload failed");
-    }
-    const { url } = await res.json();
-    return url.startsWith("/") && typeof window !== "undefined"
-      ? `${window.location.origin}${url}`
-      : url;
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editor) return;
-    setUploading(true);
-    try {
-      const url = await uploadImage(file);
-      editor.chain().focus().setImage({ src: url, alt: file.name }).run();
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
-  };
 
   if (!mounted || !editor) {
     return (
@@ -211,24 +183,14 @@ export function ProductContentEditor({
         >
           🔗
         </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          onChange={handleImageUpload}
-          className="hidden"
+        <ImageUploadZone
+          compact
+          uploadEndpoint="/api/admin/upload"
+          onUpload={(url, fileName) =>
+            editor.chain().focus().setImage({ src: url, alt: fileName ?? "" }).run()
+          }
+          className="inline-flex"
         />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className={`rounded px-2 py-1 text-sm transition-colors ${
-            editor.isActive("image") ? "bg-slate-200 text-slate-900" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-          } disabled:opacity-50`}
-          title="Insert image"
-        >
-          🖼️
-        </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}

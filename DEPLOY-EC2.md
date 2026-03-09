@@ -14,11 +14,32 @@
 
 ---
 
+## 1b. Can't SSH? Allow Your IP
+
+If SSH times out, your IP isn't in the security group. **Option A (AWS Console):**
+
+1. EC2 → Instances → select instance
+2. Security tab → click the security group link
+3. Edit inbound rules → Add rule → Type: SSH, Source: My IP → Save
+
+**Option B (AWS CLI):** Run this before SSH (replace with your instance ID from the EC2 console):
+
+```powershell
+.\scripts\allow-ssh-from-my-ip.ps1 -InstanceId i-xxxxxxxxx
+```
+
+```bash
+# Or from CloudShell/Linux:
+./scripts/allow-ssh-from-my-ip.sh i-xxxxxxxxx
+```
+
+---
+
 ## 2. Connect & Install
 
 ```bash
-# Connect (adjust key and IP)
-ssh -i your-key.pem ubuntu@YOUR_EC2_PUBLIC_IP
+# Connect (use your key and EC2 hostname)
+ssh -i betting.forum.pem ubuntu@ec2-52-200-21-14.compute-1.amazonaws.com
 
 # System updates
 sudo apt update && sudo apt upgrade -y
@@ -56,7 +77,22 @@ NEXTAUTH_SECRET="GENERATE_WITH_openssl_rand_base64_32"
 NEXTAUTH_URL="https://yourdomain.com"
 ```
 
+**Important:** `NEXTAUTH_URL` must be your public domain (e.g. `https://betting.forum`). It drives canonical URLs, sitemap, and metadata. Set it in `.env` before building.
+
 Optional: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `ANTHROPIC_API_KEY`
+
+### Google OAuth on production (if "Sign in with Google" fails)
+
+1. **Google Cloud Console** → [APIs & Credentials](https://console.cloud.google.com/apis/credentials) → your OAuth 2.0 Client ID
+2. Add to **Authorized redirect URIs**:
+   - `https://betting.forum/api/auth/callback/google`
+   - `https://www.betting.forum/api/auth/callback/google` (if you use www)
+3. Add to **Authorized JavaScript origins**:
+   - `https://betting.forum`
+   - `https://www.betting.forum` (if you use www)
+4. Ensure `.env` on the server has `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+5. Ensure `NEXTAUTH_URL` is your live URL (e.g. `https://betting.forum`) in production
+6. If behind Nginx: ensure `ecosystem.config.js` has `AUTH_TRUST_HOST: "true"` in the env (so NextAuth uses `X-Forwarded-Host` / `X-Forwarded-Proto`)
 
 ---
 
@@ -67,10 +103,10 @@ Optional: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `ANTHROP
 npx prisma generate
 npx prisma db push
 
-# Build
+# Build (NEXTAUTH_URL from .env is baked into sitemap/metadata)
 npm run build
 
-# Start with PM2
+# Start with PM2 (or use ecosystem.config.js for explicit env)
 pm2 start npm --name "betting-forum" -- start
 pm2 save
 pm2 startup
@@ -133,7 +169,7 @@ pm2 restart betting-forum
 ## Updates
 
 ```bash
-cd betting-forum
+cd /home/ubuntu/bettingforum
 git pull
 npm install
 npx prisma generate

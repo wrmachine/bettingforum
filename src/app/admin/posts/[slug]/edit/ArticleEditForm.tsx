@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { ImageUploadZone } from "@/components/ImageUploadZone";
 
 interface ArticleEditFormProps {
   slug: string;
@@ -22,40 +23,12 @@ export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
   const [featuredImageUrl, setFeaturedImageUrl] = useState(initialData.featuredImageUrl);
   const [subheadline, setSubheadline] = useState(initialData.subheadline);
   const [lead, setLead] = useState(initialData.lead);
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
-  const uploadFile = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error ?? "Upload failed");
-    }
-    const { url } = await res.json();
-    return url;
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setMessage(null);
-    try {
-      const url = await uploadFile(file);
-      setFeaturedImageUrl(url);
-      setMessage({ type: "ok", text: "Featured image uploaded." });
-    } catch (err) {
-      setMessage({
-        type: "err",
-        text: err instanceof Error ? err.message : "Upload failed",
-      });
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
+  const handleFeaturedImageChange = (url: string) => {
+    setFeaturedImageUrl(url);
+    setMessage(url ? { type: "ok", text: "Featured image updated." } : null);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -138,37 +111,14 @@ export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700">Featured Image</label>
-            <div className="mt-1 flex flex-wrap gap-4">
-              <div className="flex flex-col gap-2">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={handleImageUpload}
-                  disabled={uploading}
-                  className="block w-full text-sm text-slate-500 file:mr-2 file:rounded file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
-                />
-                <input
-                  type="url"
-                  value={featuredImageUrl}
-                  onChange={(e) => setFeaturedImageUrl(e.target.value)}
-                  placeholder="Or paste image URL"
-                  className="block w-full rounded border border-slate-300 px-3 py-2 text-sm"
-                />
-              </div>
-              {featuredImageUrl && (
-                <div className="shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={
-                      featuredImageUrl.startsWith("/") && typeof window !== "undefined"
-                        ? `${window.location.origin}${featuredImageUrl}`
-                        : featuredImageUrl
-                    }
-                    alt="Featured"
-                    className="h-24 w-24 rounded border border-slate-200 object-cover"
-                  />
-                </div>
-              )}
+            <div className="mt-1">
+              <ImageUploadZone
+                uploadEndpoint="/api/admin/upload"
+                value={featuredImageUrl}
+                onChange={handleFeaturedImageChange}
+                label="Drop featured image or click to upload"
+                allowUrlInput={true}
+              />
             </div>
           </div>
           <div>

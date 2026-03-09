@@ -6,6 +6,7 @@ import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import Youtube from "@tiptap/extension-youtube";
 import { useEffect, useRef, useState } from "react";
+import { ImageUploadZone } from "@/components/ImageUploadZone";
 
 interface RichTextEditorProps {
   value: string;
@@ -42,8 +43,6 @@ export function RichTextEditor({
   uploadEndpoint = "/api/upload",
 }: RichTextEditorProps) {
   const [mounted, setMounted] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => setMounted(true), []);
 
   const extensions = [
@@ -124,35 +123,6 @@ export function RichTextEditor({
   };
 
   const unsetLink = () => editor.chain().focus().unsetLink().run();
-
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch(uploadEndpoint, { method: "POST", body: formData, credentials: "same-origin" });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(typeof err?.error === "string" ? err.error : "Upload failed");
-    }
-    const { url } = await res.json();
-    return url.startsWith("/") && typeof window !== "undefined"
-      ? `${window.location.origin}${url}`
-      : url;
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editor) return;
-    setUploading(true);
-    try {
-      const url = await uploadImage(file);
-      editor.chain().focus().setImage({ src: url, alt: file.name }).run();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
-  };
 
   const addImageByUrl = () => {
     const url = window.prompt("Enter image URL:");
@@ -241,31 +211,20 @@ export function RichTextEditor({
         {allowMedia && (
           <>
             <span className="mx-1 border-l border-gray-200" />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={handleImageUpload}
-              className="hidden"
+            <ImageUploadZone
+              compact
+              uploadEndpoint={uploadEndpoint}
+              onUpload={(url, fileName) =>
+                editor.chain().focus().setImage({ src: url, alt: fileName ?? "" }).run()
+              }
+              disabled={disabled}
+              className="inline-flex"
             />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading || disabled}
-              className={`rounded px-2 py-1 text-sm transition-colors ${
-                editor.isActive("image")
-                  ? "bg-slate-200 text-slate-900"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              } disabled:opacity-50`}
-              title="Insert image (upload or paste URL)"
-            >
-              🖼️
-            </button>
             <button
               type="button"
               onClick={addImageByUrl}
               disabled={disabled}
-              className="rounded px-2 py-1 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
+              className="rounded-lg px-2 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
               title="Insert image from URL"
             >
               URL
@@ -274,10 +233,10 @@ export function RichTextEditor({
               type="button"
               onClick={addYoutubeVideo}
               disabled={disabled}
-              className="rounded px-2 py-1 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
+              className="rounded-lg px-2 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
               title="Embed YouTube video"
             >
-              ▶ YouTube
+              <span className="inline-flex items-center gap-1">▶ YouTube</span>
             </button>
           </>
         )}
