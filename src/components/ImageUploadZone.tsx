@@ -181,7 +181,7 @@ export function ImageUploadZone({
               >
                 {uploading ? "Uploading…" : "Replace"}
               </button>
-              {onChange && (
+              {isSingleMode && (
                 <button
                   type="button"
                   onClick={removeImage}
