@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { AccountEditForm } from "@/components/AccountEditForm";
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
@@ -17,7 +18,7 @@ export default async function AccountPage() {
     );
   }
 
-  const username = session.user?.name ?? session.user?.email?.split("@")[0] ?? "me";
+  const username = (session.user as { username?: string })?.username ?? session.user?.name ?? session.user?.email?.split("@")[0] ?? "me";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -26,6 +27,7 @@ export default async function AccountPage() {
         Manage your profile and preferences.
       </p>
       <div className="mt-8 space-y-6">
+        <AccountEditForm />
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="font-semibold text-slate-900">Profile</h2>
           <p className="mt-1 text-sm text-slate-600">View your public profile and activity.</p>

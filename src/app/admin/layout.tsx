@@ -85,6 +85,12 @@ export default function AdminLayout({
               Schema
             </Link>
             <Link
+              href="/admin/redirects"
+              className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            >
+              301 Redirects
+            </Link>
+            <Link
               href="/admin/ads"
               className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
@@ -122,6 +128,24 @@ export default function AdminLayout({
               className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
               Claude AI
+            </Link>
+            <Link
+              href="/admin/ai-bots"
+              className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            >
+              AI Bots
+            </Link>
+            <Link
+              href="/admin/ai-bots/new"
+              className="block rounded px-3 py-2 pl-6 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+            >
+              New Bot
+            </Link>
+            <Link
+              href="/admin/ai-bots/activity"
+              className="block rounded px-3 py-2 pl-6 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+            >
+              Activity
             </Link>
           </div>
         </nav>

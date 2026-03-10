@@ -198,6 +198,31 @@ export function RichTextEditor({
         <span className="mx-1 border-l border-gray-200" />
         <button
           type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={`rounded px-2 py-1 text-sm font-medium transition-colors ${
+            editor.isActive("heading", { level: 2 })
+              ? "bg-slate-200 text-slate-900"
+              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+          title="Heading 2"
+        >
+          H2
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          className={`rounded px-2 py-1 text-sm font-medium transition-colors ${
+            editor.isActive("heading", { level: 3 })
+              ? "bg-slate-200 text-slate-900"
+              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+          title="Heading 3"
+        >
+          H3
+        </button>
+        <span className="mx-1 border-l border-gray-200" />
+        <button
+          type="button"
           onClick={editor.isActive("link") ? unsetLink : setLink}
           className={`rounded px-2 py-1 text-sm transition-colors ${
             editor.isActive("link")

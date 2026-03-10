@@ -110,12 +110,12 @@ export async function getPopularThreads(limit = 9): Promise<PostCardShape[]> {
   }
 }
 
-/** Threads and articles sorted by vote count (popular) */
+/** Threads, articles, and listicles sorted by vote count (popular) */
 export async function getPopularPosts(limit = 4): Promise<FeedPostShape[]> {
   try {
     const posts = await prisma.post.findMany({
       where: {
-        type: { in: ["thread", "article"] },
+        type: { in: ["thread", "article", "listicle"] },
         status: "published",
       },
       include: feedInclude,
@@ -158,12 +158,12 @@ export async function getLatestArticle(): Promise<FeedPostShape | null> {
   }
 }
 
-/** Threads and articles mixed, sorted by newest first */
+/** Threads, articles, and listicles mixed, sorted by newest first */
 export async function getLatestPosts(limit = 15): Promise<FeedPostShape[]> {
   try {
     const posts = await prisma.post.findMany({
       where: {
-        type: { in: ["thread", "article"] },
+        type: { in: ["thread", "article", "listicle"] },
         status: "published",
       },
       include: feedInclude,

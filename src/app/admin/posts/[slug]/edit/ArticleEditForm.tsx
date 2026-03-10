@@ -6,6 +6,7 @@ import { ImageUploadZone } from "@/components/ImageUploadZone";
 
 interface ArticleEditFormProps {
   slug: string;
+  status: string;
   initialData: {
     title: string;
     excerpt: string;
@@ -16,7 +17,7 @@ interface ArticleEditFormProps {
   };
 }
 
-export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
+export function ArticleEditForm({ slug, status, initialData }: ArticleEditFormProps) {
   const [title, setTitle] = useState(initialData.title);
   const [excerpt, setExcerpt] = useState(initialData.excerpt);
   const [body, setBody] = useState(initialData.body);
@@ -24,6 +25,8 @@ export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
   const [subheadline, setSubheadline] = useState(initialData.subheadline);
   const [lead, setLead] = useState(initialData.lead);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(status);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   const handleFeaturedImageChange = (url: string) => {
@@ -59,6 +62,28 @@ export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
       setMessage({ type: "err", text: e instanceof Error ? e.message : "Save failed" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePublish = async (publish: boolean) => {
+    setPublishing(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/posts/${slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: publish ? "published" : "draft" }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? "Failed");
+      }
+      setCurrentStatus(publish ? "published" : "draft");
+      setMessage({ type: "ok", text: publish ? "Article published. It is now visible at /articles/" + slug : "Article unpublished (draft)." });
+    } catch (e) {
+      setMessage({ type: "err", text: e instanceof Error ? e.message : "Failed" });
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -148,13 +173,34 @@ export function ArticleEditForm({ slug, initialData }: ArticleEditFormProps) {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="rounded-lg bg-felt px-6 py-2 font-medium text-white hover:bg-felt/90 disabled:opacity-50"
-      >
-        {saving ? "Saving…" : "Save Changes"}
-      </button>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-lg bg-felt px-6 py-2 font-medium text-white hover:bg-felt/90 disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save Changes"}
+        </button>
+        {currentStatus === "draft" ? (
+          <button
+            type="button"
+            onClick={() => handlePublish(true)}
+            disabled={publishing}
+            className="rounded-lg bg-green-600 px-6 py-2 font-medium text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            {publishing ? "Publishing…" : "Publish Article"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => handlePublish(false)}
+            disabled={publishing}
+            className="rounded-lg border border-slate-300 bg-white px-6 py-2 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {publishing ? "…" : "Unpublish (Draft)"}
+          </button>
+        )}
+      </div>
     </form>
   );
 }

@@ -10,6 +10,28 @@ import { formatRelativeTime, stripHtml } from "@/lib/format";
 import { parseShortcodes } from "@/lib/shortcodes";
 import type { ShortcodeData } from "@/lib/shortcode-resolve";
 
+/* Shared prose styling for article content - headings, lists, blockquotes, etc. */
+const articleProseClasses =
+  "prose prose-slate prose-lg max-w-none text-slate-700 " +
+  "prose-headings:font-semibold prose-headings:text-slate-900 prose-headings:tracking-tight " +
+  "prose-h1:text-3xl prose-h1:mt-8 prose-h1:mb-4 prose-h1:font-bold " +
+  "prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:font-bold " +
+  "prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3 prose-h3:font-semibold " +
+  "prose-h4:text-lg prose-h4:mt-4 prose-h4:mb-2 prose-h4:font-semibold " +
+  "prose-h5:text-base prose-h5:mt-3 prose-h5:mb-2 prose-h5:font-semibold " +
+  "prose-h6:text-sm prose-h6:mt-3 prose-h6:mb-1 prose-h6:font-semibold prose-h6:uppercase prose-h6:tracking-wider " +
+  "prose-p:my-4 prose-p:leading-relaxed prose-p:text-slate-700 " +
+  "prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6 prose-li:my-1.5 prose-li:text-slate-700 " +
+  "prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-6 " +
+  "[&_strong]:font-semibold [&_strong]:text-slate-900 [&_em]:italic [&_em]:text-slate-800 " +
+  "prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:my-6 prose-blockquote:text-slate-700 prose-blockquote:italic " +
+  "prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:text-slate-800 " +
+  "prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto prose-pre:my-4 " +
+  "prose-hr:my-8 prose-hr:border-slate-200 " +
+  "prose-a:text-felt prose-a:no-underline hover:prose-a:underline prose-a:font-medium " +
+  "prose-img:rounded-lg prose-img:shadow-md prose-img:max-w-full prose-img:h-auto " +
+  "prose-table:border prose-table:border-slate-200 prose-table:rounded-lg prose-th:bg-slate-100 prose-th:px-4 prose-th:py-2 prose-th:font-semibold prose-td:px-4 prose-td:py-2";
+
 function ArticleBody({
   body,
   shortcodeData,
@@ -24,7 +46,7 @@ function ArticleBody({
     return (
       <div className="mt-8">
         <div
-          className="article-body text-lg leading-relaxed text-slate-700 sm:text-xl [&_p]:mb-4 [&_p]:leading-relaxed"
+          className={`article-prose ${articleProseClasses}`}
           dangerouslySetInnerHTML={{ __html: body }}
         />
       </div>
@@ -33,7 +55,7 @@ function ArticleBody({
 
   return (
     <div className="mt-8">
-      <div className="article-body space-y-4 text-lg leading-relaxed text-slate-700 sm:text-xl [&_p]:mb-4 [&_p]:leading-relaxed">
+      <div className={`article-body article-prose space-y-4 ${articleProseClasses}`}>
         {segments.map((seg, i) =>
           seg.type === "text" ? (
             seg.content ? (

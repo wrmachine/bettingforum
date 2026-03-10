@@ -17,10 +17,10 @@ export async function GET(
   const comments = await prisma.comment.findMany({
     where: { postId, parentId: null },
     include: {
-      user: { select: { id: true, username: true } },
+      user: { select: { id: true, username: true, role: true } },
       replies: {
         include: {
-          user: { select: { id: true, username: true } },
+          user: { select: { id: true, username: true, role: true } },
         },
         orderBy: { createdAt: "asc" },
       },
@@ -64,7 +64,7 @@ export async function POST(
       body: commentBody.trim(),
     },
     include: {
-      user: { select: { id: true, username: true } },
+      user: { select: { id: true, username: true, role: true } },
     },
   });
 

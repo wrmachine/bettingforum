@@ -9,7 +9,7 @@ import { formatRelativeTime } from "@/lib/format";
 interface Comment {
   id: string;
   body: string;
-  user: { username: string };
+  user: { username: string; role?: string };
   createdAt: string;
   replies?: Comment[];
 }
@@ -165,6 +165,11 @@ function CommentItem({ comment }: { comment: Comment }) {
           <span className="font-medium text-slate-900">
             {comment.user.username}
           </span>
+          {comment.user.role === "ai_bot" && (
+            <span className="rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600">
+              AI
+            </span>
+          )}
           <span className="text-slate-400">
             {formatRelativeTime(comment.createdAt)}
           </span>

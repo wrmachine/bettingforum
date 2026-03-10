@@ -121,7 +121,7 @@ export default function CompleteProfilePage() {
             <div className="mt-1 flex items-center gap-4">
               <div className="h-16 w-16 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
                 {avatarUrl ? (
-                  <Image src={avatarUrl} alt="Avatar" width={64} height={64} className="object-cover h-full w-full" />
+                  <Image src={avatarUrl} alt="Avatar" width={64} height={64} className="h-full w-full object-cover" unoptimized={avatarUrl.startsWith("/uploads/")} />
                 ) : (
                   <span className="text-gray-400 text-2xl">{session?.user?.name?.[0] ?? "?"}</span>
                 )}

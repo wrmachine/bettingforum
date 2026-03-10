@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -17,7 +18,7 @@ interface ThreadDetailProps {
     body: string | null;
     excerpt: string | null;
     createdAt?: string;
-    author: { username: string };
+    author: { username: string; role?: string; avatarUrl?: string | null };
     votes: number;
     comments: number;
     tags: { name: string }[];
@@ -107,11 +108,29 @@ export function ThreadDetail({ post }: ThreadDetailProps) {
                 href={`/u/${post.author.username}`}
                 className="flex shrink-0 items-center gap-3"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
-                  {post.author.username.charAt(0).toUpperCase()}
-                </span>
+                {post.author.avatarUrl ? (
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-slate-200">
+                    <Image
+                      src={post.author.avatarUrl}
+                      alt={post.author.username}
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                      unoptimized={post.author.avatarUrl.startsWith("/uploads/")}
+                    />
+                  </div>
+                ) : (
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
+                    {post.author.username.charAt(0).toUpperCase()}
+                  </span>
+                )}
                 <div>
                   <span className="font-medium text-slate-900">{post.author.username}</span>
+                  {post.author.role === "ai_bot" && (
+                    <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600">
+                      AI
+                    </span>
+                  )}
                   <span className="ml-2 text-sm text-slate-500">
                     {post.createdAt && formatRelativeTime(post.createdAt)}
                   </span>
@@ -136,7 +155,7 @@ export function ThreadDetail({ post }: ThreadDetailProps) {
           {/* Post body — HTML from rich editor or plain text */}
           {post.body && (
             <div className="mt-6 border-t border-slate-100 pt-6">
-              <div className="prose prose-slate max-w-none text-slate-700 prose-p:my-3 prose-ul:my-3 prose-li:my-0.5 prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto [&_[data-youtube-video]]:my-4 [&_[data-youtube-video]_iframe]:aspect-video [&_[data-youtube-video]_iframe]:w-full [&_[data-youtube-video]_iframe]:max-w-2xl">
+              <div className="article-prose prose prose-slate prose-lg max-w-none text-slate-700 prose-p:my-4 prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4 prose-li:my-1.5 prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-headings:font-semibold prose-headings:text-slate-900 prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-3 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-200 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 [&_strong]:font-semibold [&_strong]:text-slate-900 prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-lg prose-pre:p-4 [&_[data-youtube-video]]:my-4 [&_[data-youtube-video]_iframe]:aspect-video [&_[data-youtube-video]_iframe]:w-full [&_[data-youtube-video]_iframe]:max-w-2xl">
                 {/<[a-z][\s\S]*>/i.test(post.body) ? (
                   <div
                     dangerouslySetInnerHTML={{ __html: post.body }}

@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user.password) return null;
         const valid = await bcrypt.compare(String(credentials.password), user.password);
         if (!valid) return null;
-        return { id: user.id, email: user.email, name: user.username, role: user.role };
+        return { id: user.id, email: user.email, name: user.username, image: user.avatarUrl ?? undefined, role: user.role };
       },
     }),
     GoogleProvider({
@@ -72,25 +72,30 @@ export const authOptions: NextAuthOptions = {
         if (existingId) {
           token.id = existingId;
           token.role = (user as { role?: string }).role;
+          token.username = (user as { name?: string }).name ?? undefined;
         } else {
           const email = (user.email ?? token.email) as string;
           if (email) {
             const dbUser = await prisma.user.findUnique({
               where: { email: String(email).trim().toLowerCase() },
-              select: { id: true, role: true },
+              select: { id: true, role: true, username: true },
             });
             if (dbUser) {
               token.id = dbUser.id;
               token.role = dbUser.role;
+              token.username = dbUser.username;
             }
           }
         }
-      } else if (token.id && !token.role) {
+      } else if (token.id && (!token.role || !token.username)) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true },
+          select: { role: true, username: true },
         });
-        if (dbUser) token.role = dbUser.role;
+        if (dbUser) {
+          if (!token.role) token.role = dbUser.role;
+          if (!token.username) token.username = dbUser.username;
+        }
       }
       return token;
     },
@@ -98,6 +103,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         (session.user as { role?: string }).role = token.role as string;
+        (session.user as { username?: string }).username = (token.username as string) ?? null;
       }
       return session;
     },

@@ -46,12 +46,39 @@ export function ArticleCard({ article }: ArticleCardProps) {
   };
 
   return (
-    <article className="flex rounded-lg border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
+    <article className="flex overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
+      {/* Up/Down vote column - on the left (matches ForumThreadCard, PostCard) */}
+      <div className="flex w-10 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-slate-100 bg-slate-50/50 py-2">
+        <button
+          type="button"
+          onClick={(e) => handleVote(e, "up")}
+          disabled={status !== "authenticated" || voting}
+          className="text-slate-400 transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Upvote"
+        >
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4l8 8h-5v8h-6v-8H4l8-8z" />
+          </svg>
+        </button>
+        <span className="text-xs font-semibold text-slate-700">{votes}</span>
+        <button
+          type="button"
+          onClick={(e) => handleVote(e, "down")}
+          disabled={status !== "authenticated" || voting}
+          className="text-slate-400 transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Downvote"
+        >
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 20l-8-8h5V4h6v8h5l-8 8z" />
+          </svg>
+        </button>
+      </div>
+
       {/* Big rectangle image + content */}
       <Link href={`/articles/${article.slug}`} className="min-w-0 flex-1">
-        <div className="flex flex-row">
-          {/* Square featured image - 10rem x 10rem */}
-          <div className="h-[10rem] w-[10rem] shrink-0 overflow-hidden rounded-sm bg-slate-100">
+        <div className="flex flex-col md:flex-row">
+          {/* Featured image: full-width banner on mobile, square on desktop */}
+          <div className="aspect-video w-full shrink-0 overflow-hidden rounded-t-lg bg-slate-100 md:h-[10rem] md:w-[10rem] md:rounded-t-none md:rounded-l-sm md:aspect-auto">
             {article.featuredImageUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
@@ -99,33 +126,6 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </div>
         </div>
       </Link>
-
-      {/* Up/Down vote column - on the right */}
-      <div className="flex w-10 shrink-0 flex-col items-center justify-center gap-0.5 border-l border-slate-100 bg-slate-50/50 py-2">
-        <button
-          type="button"
-          onClick={(e) => handleVote(e, "up")}
-          disabled={status !== "authenticated" || voting}
-          className="text-slate-400 transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label="Upvote"
-        >
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 4l8 8h-5v8h-6v-8H4l8-8z" />
-          </svg>
-        </button>
-        <span className="text-xs font-semibold text-slate-700">{votes}</span>
-        <button
-          type="button"
-          onClick={(e) => handleVote(e, "down")}
-          disabled={status !== "authenticated" || voting}
-          className="text-slate-400 transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label="Downvote"
-        >
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 20l-8-8h5V4h6v8h5l-8 8z" />
-          </svg>
-        </button>
-      </div>
     </article>
   );
 }

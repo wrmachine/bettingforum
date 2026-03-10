@@ -168,9 +168,10 @@ export function BonusDetail({ post }: BonusDetailProps) {
         {post.body && (
           <div className="mt-8 border-t border-gray-100 pt-8">
             <h2 className="text-lg font-semibold text-gray-900">Description</h2>
-            <div className="mt-4 prose max-w-none text-gray-600">
-              {post.body}
-            </div>
+            <div
+              className="article-prose mt-4 prose prose-slate prose-lg max-w-none text-slate-700 prose-headings:font-semibold prose-headings:text-slate-900 prose-p:my-4 prose-p:leading-relaxed prose-ul:my-4 prose-ol:my-4 prose-li:my-1.5 prose-h2:mt-6 prose-h2:mb-3 prose-h2:text-xl prose-h3:mt-4 prose-h3:mb-2 prose-h3:text-lg [&_strong]:font-semibold [&_strong]:text-slate-900 prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:my-4 prose-a:text-felt prose-a:no-underline hover:prose-a:underline prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto prose-img:rounded-lg prose-img:max-w-full"
+              dangerouslySetInnerHTML={{ __html: post.body }}
+            />
           </div>
         )}
         {/* Discussion */}

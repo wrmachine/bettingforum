@@ -33,6 +33,7 @@ export default async function AdminPostEditPage({
       excerpt: true,
       body: true,
       type: true,
+      status: true,
       article: { select: { featuredImageUrl: true, subheadline: true, lead: true } },
     },
   });
@@ -81,12 +82,13 @@ export default async function AdminPostEditPage({
         <h1 className="mt-2 text-2xl font-bold text-slate-900">
           Edit: {post.title}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">Type: {post.type}</p>
+        <p className="mt-1 text-sm text-slate-500">Type: {post.type} · Status: {post.status}</p>
       </div>
 
       {post.type === "article" ? (
         <ArticleEditForm
           slug={post.slug}
+          status={post.status}
           initialData={{
             title: post.title,
             excerpt: post.excerpt ?? "",
@@ -99,6 +101,8 @@ export default async function AdminPostEditPage({
       ) : (
         <PostEditForm
           slug={post.slug}
+          status={post.status}
+          type={post.type}
           initialData={{
             title: post.title,
             excerpt: post.excerpt ?? "",

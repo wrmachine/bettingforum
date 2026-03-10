@@ -1,6 +1,7 @@
 import { SectionList } from "@/components/SectionList";
 import { HomeLeftSidebar } from "@/components/HomeLeftSidebar";
 import { HomePageHero } from "@/components/HomePageHero";
+import { MobileSidebarDrawer } from "@/components/MobileSidebarDrawer";
 import { getPopularPosts, getLatestArticle, getLatestPosts } from "@/lib/posts";
 import { getForumsWithOverrides } from "@/lib/forums";
 
@@ -15,8 +16,10 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-8" data-section="home">
       <HomePageHero />
-      <div className="flex flex-col gap-8 lg:flex-row">
-        <HomeLeftSidebar forums={forums} />
+      <div className="flex flex-col gap-8 lg:flex-row lg:gap-8">
+        <MobileSidebarDrawer>
+          <HomeLeftSidebar forums={forums} />
+        </MobileSidebarDrawer>
         <div className="min-w-0 flex-1 space-y-10">
           <SectionList
             popularPosts={popularPosts}

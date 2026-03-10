@@ -36,7 +36,7 @@ export function HomeSidebar() {
           ) : session ? (
             <div className="space-y-3">
               <Link
-                href={`/u/${stats?.username ?? session.user?.name ?? session.user?.email ?? "me"}`}
+                href={`/u/${stats?.username ?? (session.user as { username?: string })?.username ?? session.user?.name ?? session.user?.email ?? "me"}`}
                 className="flex items-center gap-3"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
@@ -81,7 +81,7 @@ export function HomeSidebar() {
               </div>
               <button
                 type="button"
-                onClick={() => signOut()}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Log out

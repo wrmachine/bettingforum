@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import { ForumSidebar } from "./ForumSidebar";
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
@@ -59,7 +60,7 @@ export function Navbar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const displayName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "User";
+  const displayName = (session?.user as { username?: string })?.username ?? session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "User";
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -134,105 +135,20 @@ export function Navbar() {
             className="absolute inset-0 bg-black/50"
             aria-label="Close menu"
           />
-          <div className="absolute right-0 top-0 h-full w-[min(320px,85vw)] overflow-y-auto bg-header-navy shadow-xl">
+          <div className="absolute left-0 top-0 h-full w-[min(320px,85vw)] overflow-y-auto bg-white shadow-xl transition-transform duration-300 ease-out">
             <div className="flex flex-col gap-6 px-4 py-6">
-              <div className="flex items-center justify-between border-b border-slate-600 pb-4">
-                <span className="font-semibold text-white">Menu</span>
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                <span className="font-semibold text-slate-900">Forums</span>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="rounded p-2 text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                  className="rounded p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   aria-label="Close menu"
                 >
                   <HamburgerIcon open />
                 </button>
               </div>
-
-              <nav className="flex flex-col gap-1">
-                <span className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Main
-                </span>
-                {mainNav
-                  .filter((item) => item.label.toLowerCase() !== "news")
-                  .map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="rounded px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-              </nav>
-
-              <nav className="flex flex-col gap-1">
-                <span className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  More
-                </span>
-                {secondaryNav
-                  .filter((i) => i.order < 10)
-                  .sort((a, b) => a.order - b.order)
-                  .map((item) =>
-                    item.children && item.children.length > 0 ? (
-                      <div key={item.id}>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedMobileId((id) => (id === item.id ? null : item.id))
-                          }
-                          className="flex w-full items-center justify-between rounded px-3 py-2.5 text-left text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white"
-                        >
-                          {item.label}
-                          <svg
-                            className={`h-4 w-4 transition-transform ${expandedMobileId === item.id ? "rotate-180" : ""}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                        {expandedMobileId === item.id && (
-                          <div className="ml-4 flex flex-col border-l border-slate-600 pl-3">
-                            {item.children.map((child) => (
-                              <Link
-                                key={child.id}
-                                href={child.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="rounded px-2 py-2 text-sm text-slate-400 hover:text-white"
-                              >
-                                {child.label}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <Link
-                        key={item.id}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="rounded px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white"
-                      >
-                        {item.label}
-                      </Link>
-                    )
-                  )}
-              </nav>
-
-              <div className="border-t border-slate-600 pt-4">
-                <Link
-                  href="/submit/thread"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block rounded px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white"
-                >
-                  Submit
-                </Link>
-              </div>
+              <ForumSidebar onLinkClick={() => setMobileMenuOpen(false)} />
             </div>
           </div>
         </div>
@@ -241,12 +157,23 @@ export function Navbar() {
       {/* Top bar - bright green */}
       <div className="bg-header-green">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-3 sm:px-6">
-          <Link
-            href="/"
-            className="text-xl font-bold italic uppercase tracking-tight text-white hover:text-white/90"
-          >
-            Betting Forum
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              className="md:hidden rounded p-2 text-white hover:bg-white/10"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              <HamburgerIcon open={mobileMenuOpen} />
+            </button>
+            <Link
+              href="/"
+              className="text-xl font-bold italic uppercase tracking-tight text-white hover:text-white/90"
+            >
+              Betting Forum
+            </Link>
+          </div>
 
           <nav className="hidden items-center gap-8 md:flex">
             {mainNav
@@ -263,18 +190,9 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen((o) => !o)}
-              className="md:hidden rounded p-2 text-white hover:bg-white/10"
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileMenuOpen}
-            >
-              <HamburgerIcon open={mobileMenuOpen} />
-            </button>
             <Link
               href="/search"
-              className="text-white hover:text-white/90"
+              className="hidden text-white hover:text-white/90 md:inline-flex"
               aria-label="Search"
             >
               <svg
@@ -309,7 +227,7 @@ export function Navbar() {
                   {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-1 min-w-[160px] rounded-md border border-slate-700 bg-white py-2 shadow-lg">
                     <Link
-                      href={`/u/${displayName}`}
+                      href={`/u/${encodeURIComponent(displayName)}`}
                       onClick={() => setUserMenuOpen(false)}
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
                     >
@@ -336,7 +254,7 @@ export function Navbar() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   className="rounded-md bg-white px-4 py-2 text-sm font-medium text-header-green hover:bg-white/90"
                 >
                   Log off

@@ -94,22 +94,6 @@ export function PostCard({ post, fromForum }: PostCardProps) {
         </button>
       </div>
 
-      {/* Square graphic */}
-      <div className="flex shrink-0 items-center justify-center self-stretch p-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-slate-100 text-sm font-bold text-slate-500">
-          {post.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={post.logoUrl}
-              alt=""
-              className="h-10 w-10 rounded-sm object-cover"
-            />
-          ) : (
-            post.title.charAt(0)
-          )}
-        </div>
-      </div>
-
       <Link href={href} className="min-w-0 flex-1 p-4">
         <div className="min-w-0 flex-1">
           <span className="text-xs font-medium text-slate-500">

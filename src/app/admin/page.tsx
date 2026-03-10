@@ -87,6 +87,12 @@ export default function AdminPage() {
             <p className="mt-1 text-sm text-gray-500">AI prompts & system settings</p>
           </div>
         </Link>
+        <Link href="/admin/redirects">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 transition hover:border-slate-300 hover:shadow-sm">
+            <h2 className="font-semibold text-gray-900">301 Redirects</h2>
+            <p className="mt-1 text-sm text-gray-500">Old site → new site migration</p>
+          </div>
+        </Link>
       </div>
     </div>
   );

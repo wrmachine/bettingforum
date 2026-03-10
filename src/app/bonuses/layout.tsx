@@ -1,5 +1,6 @@
 import { ForumSidebar } from "@/components/ForumSidebar";
 import { BonusesPageHeader } from "@/components/BonusesPageHeader";
+import { MobileSidebarDrawer } from "@/components/MobileSidebarDrawer";
 import { getForumsWithOverrides } from "@/lib/forums";
 
 export default async function BonusesLayout({
@@ -12,7 +13,9 @@ export default async function BonusesLayout({
     <div className="flex flex-col" data-section="bonuses">
       <BonusesPageHeader />
       <div className="mt-8 flex gap-8">
-        <ForumSidebar forums={forums} />
+        <MobileSidebarDrawer>
+          <ForumSidebar forums={forums} />
+        </MobileSidebarDrawer>
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     </div>

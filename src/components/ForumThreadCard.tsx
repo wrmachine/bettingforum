@@ -75,13 +75,6 @@ export function ForumThreadCard({ thread }: ForumThreadCardProps) {
         </button>
       </div>
 
-      {/* Small square graphic (matches PostCard) */}
-      <div className="flex shrink-0 items-center justify-center self-stretch p-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-slate-100 text-sm font-bold text-slate-500">
-          {thread.title.charAt(0).toUpperCase()}
-        </div>
-      </div>
-
       <Link href={`/threads/${thread.slug}`} className="min-w-0 flex-1 p-4">
         <div className="min-w-0 flex-1">
           <span className="text-xs font-medium text-slate-500">Discussion</span>

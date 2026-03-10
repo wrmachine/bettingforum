@@ -123,26 +123,42 @@ function NavLink({
   label,
   icon,
   active,
+  variant,
+  onLinkClick,
 }: {
   href: string;
   label: string;
   icon: string;
   active?: boolean;
+  variant?: "sidebar" | "mobile";
+  onLinkClick?: () => void;
 }) {
+  const isMobile = variant === "mobile";
   return (
     <Link
       href={href}
+      onClick={onLinkClick}
       className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-        active ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        isMobile
+          ? active
+            ? "bg-slate-700/50 font-medium text-white"
+            : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+          : active
+            ? "bg-slate-100 font-medium text-slate-900"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
       }`}
     >
-      <span className="text-slate-400">{icons[icon] ?? icons.globe}</span>
+      <span className={isMobile ? "text-slate-400" : "text-slate-400"}>{icons[icon] ?? icons.globe}</span>
       {label}
     </Link>
   );
 }
 
-export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] }) {
+export function ForumSidebar({
+  forums: forumsProp,
+  variant = "sidebar",
+  onLinkClick,
+}: { forums?: ForumConfig[]; variant?: "sidebar" | "mobile"; onLinkClick?: () => void }) {
   const pathname = usePathname();
 
   const topicForums = forumsProp
@@ -171,8 +187,14 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
     return pathname === path || (path !== "/" && pathname.startsWith(path));
   };
 
+  const headingClass = variant === "mobile"
+    ? "mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400"
+    : "mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500";
+
+  const navLinkProps = { variant, onLinkClick };
+
   return (
-    <aside className="w-56 shrink-0">
+    <aside className={variant === "mobile" ? "shrink-0" : "w-56 shrink-0"}>
       <nav className="space-y-6">
         {/* General navigation */}
         <div className="space-y-0.5">
@@ -183,15 +205,14 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
               label={item.label}
               icon={item.icon}
               active={item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)}
+              {...navLinkProps}
             />
           ))}
         </div>
 
         {/* Topic Forums */}
         <div>
-          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Topic Forums
-          </h3>
+          <h3 className={headingClass}>Topic Forums</h3>
           <div className="space-y-0.5">
             {topicForums.map((item) => (
               <NavLink
@@ -200,6 +221,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
                 label={item.label}
                 icon={item.icon}
                 active={isActive(item.href)}
+                {...navLinkProps}
               />
             ))}
           </div>
@@ -207,15 +229,14 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
 
         {/* Articles */}
         <div>
-          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Articles
-          </h3>
+          <h3 className={headingClass}>Articles</h3>
           <div className="space-y-0.5">
             <NavLink
               href="/listicles"
               label="Best Of"
               icon="article"
               active={pathname === "/listicles" || pathname.startsWith("/listicles/")}
+              {...navLinkProps}
             />
             {contentForums.map((item) => (
               <NavLink
@@ -224,6 +245,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
                 label={item.label}
                 icon={item.icon}
                 active={isActive(item.href)}
+                {...navLinkProps}
               />
             ))}
           </div>
@@ -231,9 +253,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
 
         {/* Sports Forums */}
         <div>
-          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Sports
-          </h3>
+          <h3 className={headingClass}>Sports</h3>
           <div className="space-y-0.5">
             {sportsForums.map((item) => (
               <NavLink
@@ -242,6 +262,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
                 label={item.label}
                 icon={item.icon}
                 active={isActive(item.href)}
+                {...navLinkProps}
               />
             ))}
           </div>
@@ -249,9 +270,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
 
         {/* Product Forums */}
         <div>
-          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Product Forums
-          </h3>
+          <h3 className={headingClass}>Product Forums</h3>
           <div className="space-y-0.5">
             {productForums.map((item) => (
               <NavLink
@@ -260,6 +279,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
                 label={item.label}
                 icon={item.icon}
                 active={isActive(item.href)}
+                {...navLinkProps}
               />
             ))}
           </div>
@@ -267,9 +287,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
 
         {/* Bonus */}
         <div>
-          <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Bonus
-          </h3>
+          <h3 className={headingClass}>Bonus</h3>
           <div className="space-y-0.5">
             {bonusForums.map((item) => (
               <NavLink
@@ -278,6 +296,7 @@ export function ForumSidebar({ forums: forumsProp }: { forums?: ForumConfig[] })
                 label={item.label}
                 icon={item.icon}
                 active={isActive(item.href)}
+                {...navLinkProps}
               />
             ))}
           </div>

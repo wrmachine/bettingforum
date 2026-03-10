@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ForumSidebar } from "@/components/ForumSidebar";
+import { MobileSidebarDrawer } from "@/components/MobileSidebarDrawer";
 import { buildMetadata } from "@/lib/seo";
 import { getForumsWithOverrides } from "@/lib/forums";
 
@@ -34,7 +35,9 @@ export default async function ArticlesLayout({
   const forums = await getForumsWithOverrides();
   return (
     <div className="flex gap-8">
-      <ForumSidebar forums={forums} />
+      <MobileSidebarDrawer>
+        <ForumSidebar forums={forums} />
+      </MobileSidebarDrawer>
       <div className="min-w-0 flex-1">
         {children}
       </div>

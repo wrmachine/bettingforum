@@ -1,6 +1,7 @@
 import { ForumSidebar } from "@/components/ForumSidebar";
 import { ListiclesPageHeader } from "@/components/ListiclesPageHeader";
 import { ListicleDetailHeader } from "@/components/ListicleDetailHeader";
+import { MobileSidebarDrawer } from "@/components/MobileSidebarDrawer";
 import { getForumsWithOverrides } from "@/lib/forums";
 
 export default async function ListiclesLayout({
@@ -14,7 +15,9 @@ export default async function ListiclesLayout({
       <ListiclesPageHeader />
       <ListicleDetailHeader />
       <div className="mt-8 flex gap-8">
-        <ForumSidebar forums={forums} />
+        <MobileSidebarDrawer>
+          <ForumSidebar forums={forums} />
+        </MobileSidebarDrawer>
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     </div>

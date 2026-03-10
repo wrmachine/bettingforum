@@ -20,7 +20,7 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const { promoted, featured, title, excerpt, postBody, article: articleData } = body;
+  const { promoted, featured, status: statusParam, title, excerpt, postBody, article: articleData } = body;
 
   const existing = await prisma.post.findUnique({
     where: { id: postId },
@@ -37,6 +37,14 @@ export async function PATCH(
       select: { id: true, slug: true, promoted: true },
     });
     return NextResponse.json(post);
+  }
+
+  if (statusParam === "published" || statusParam === "draft") {
+    await prisma.post.update({
+      where: { id: postId },
+      data: { status: statusParam },
+    });
+    return NextResponse.json({ slug: (await prisma.post.findUnique({ where: { id: postId }, select: { slug: true } }))?.slug, status: statusParam });
   }
 
   if (typeof featured === "boolean" && existing.type === "bonus" && existing.bonus) {
@@ -123,7 +131,7 @@ export async function GET(
   const post = await prisma.post.findUnique({
     where: { slug, status: "published" },
     include: {
-      author: { select: { id: true, username: true } },
+      author: { select: { id: true, username: true, role: true, avatarUrl: true } },
       product: {
         include: {
           reviews: { select: { rating: true } },

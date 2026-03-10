@@ -7,7 +7,7 @@ import { sendVerificationEmail } from "@/lib/email";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, username, password } = body;
+    const { email, username, password, newsletterOptIn } = body;
 
     const emailNormalized = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!emailNormalized || !emailNormalized.includes("@")) {
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
         role: "user",
         verificationToken,
         verificationTokenExpires,
+        newsletterOptIn: Boolean(newsletterOptIn),
       },
     });
 

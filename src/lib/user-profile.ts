@@ -6,6 +6,9 @@ export type UserProfile = {
   username: string;
   role: string;
   createdAt: Date;
+  avatarUrl?: string | null;
+  location?: string | null;
+  bio?: string | null;
   stats: {
     posts: number;
     threads: number;
@@ -43,6 +46,9 @@ export async function getUserProfileByUsername(
       username: true,
       role: true,
       createdAt: true,
+      avatarUrl: true,
+      location: true,
+      bio: true,
       _count: {
         select: {
           posts: true,
@@ -102,6 +108,9 @@ export async function getUserProfileByUsername(
     username: user.username,
     role: user.role,
     createdAt: user.createdAt,
+    avatarUrl: user.avatarUrl ?? null,
+    location: user.location ?? null,
+    bio: user.bio ?? null,
     stats: {
       posts,
       threads: threadsCount,

@@ -33,3 +33,33 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
   }
   return true;
 }
+
+export async function sendPasswordResetEmail(to: string, token: string): Promise<boolean> {
+  if (!resend) {
+    console.warn("RESEND_API_KEY not set. Skipping password reset email. In dev, use the reset link from logs.");
+    return false;
+  }
+
+  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const resetUrl = `${baseUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+
+  const { error } = await resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: `Reset your ${APP_NAME} password`,
+    html: `
+      <h2>Reset your password</h2>
+      <p>You requested a password reset. Click the link below to set a new password.</p>
+      <p><a href="${resetUrl}" style="color: #dc2626; font-weight: 600;">Reset my password</a></p>
+      <p>Or copy this link: ${resetUrl}</p>
+      <p>This link expires in 1 hour.</p>
+      <p>If you didn't request a password reset, you can ignore this email.</p>
+    `,
+  });
+
+  if (error) {
+    console.error("Failed to send password reset email:", error);
+    return false;
+  }
+  return true;
+}

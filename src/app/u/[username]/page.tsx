@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getUserProfileByUsername } from "@/lib/user-profile";
@@ -80,24 +81,42 @@ export default async function ProfilePage({
   const roleBadge = getRoleBadge(profile.role);
   const reputationTier = getReputationTier(profile.stats);
 
-  return (
-    <div className="mx-auto max-w-4xl">
-      {/* Profile header - professional betting forum style */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        {/* Banner strip - felt green accent */}
-        <div className="h-24 bg-gradient-to-r from-felt to-felt-light" />
+  const statStyles = [
+    { iconBg: "bg-emerald-500/15", iconColor: "text-felt" },
+    { iconBg: "bg-sky-500/15", iconColor: "text-sky-600" },
+    { iconBg: "bg-violet-500/15", iconColor: "text-violet-600" },
+    { iconBg: "bg-amber-500/15", iconColor: "text-amber-700" },
+    { iconBg: "bg-rose-500/15", iconColor: "text-rose-600" },
+  ];
 
-        <div className="relative px-6 pb-6">
-          {/* Avatar - overlaps banner */}
-          <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-slate-200 text-3xl font-bold text-slate-600 shadow-lg">
-              {profile.username.charAt(0).toUpperCase()}
+  return (
+    <div className="mx-auto max-w-4xl px-4 sm:px-0">
+      {/* Profile header - avatar overlaps banner, content stays in white area */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/50">
+        {/* Banner - no overflow-hidden on parent so content isn't clipped */}
+        <div className="relative h-24 overflow-hidden rounded-t-2xl bg-gradient-to-br from-felt via-felt-light to-felt-dark">
+          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+        </div>
+
+        <div className="relative px-6 pb-6 pt-1">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            {/* Avatar - only this overlaps the banner; neg margin on this element alone */}
+            <div className="-mt-12 shrink-0 sm:-mt-14">
+              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border-4 border-white bg-slate-100 text-2xl font-bold text-slate-600 shadow-lg sm:h-28 sm:w-28 sm:text-3xl">
+                {profile.avatarUrl ? (
+                  <Image src={profile.avatarUrl} alt={profile.username} width={112} height={112} className="h-full w-full object-cover" unoptimized={profile.avatarUrl.startsWith("/uploads/")} />
+                ) : (
+                  profile.username.charAt(0).toUpperCase()
+                )}
+              </div>
             </div>
 
-            <div className="flex min-w-0 flex-1 flex-col gap-2 pb-1 sm:flex-row sm:items-end sm:justify-between">
+            {/* Username, badges, etc - stays in white area, never clipped */}
+            <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl font-bold text-slate-900">{profile.username}</h1>
+                  <h1 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{profile.username}</h1>
                   <span
                     className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${roleBadge.className}`}
                   >
@@ -107,19 +126,26 @@ export default async function ProfilePage({
                     {reputationTier}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1.5 text-sm text-slate-500">
                   Member since {new Date(profile.createdAt).toLocaleDateString("en-US", {
                     month: "long",
                     year: "numeric",
                   })}
+                  {profile.location && <span> · {profile.location}</span>}
                 </p>
+                {profile.bio && (
+                  <div
+                    className="mt-2 max-w-2xl text-sm text-slate-600 prose prose-slate prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: profile.bio }}
+                  />
+                )}
               </div>
               {isOwnProfile && (
                 <Link
                   href="/account"
-                  className="inline-flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  className="group inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
                 >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 transition-transform group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -141,7 +167,7 @@ export default async function ProfilePage({
         </div>
       </div>
 
-      {/* Stats grid - betting forum metrics */}
+      {/* Stats grid - betting forum metrics with personality */}
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
         {[
           {
@@ -209,23 +235,25 @@ export default async function ProfilePage({
               </svg>
             ),
           },
-        ].map((stat) => (
+        ].map((stat, i) => (
           <div
             key={stat.label}
-            className="flex flex-col gap-1 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="group flex flex-col gap-2.5 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-200 hover:border-slate-300/80 hover:shadow-md hover:shadow-slate-200/40"
           >
-            <span className="flex items-center gap-2 text-slate-500">
-              {stat.icon}
+            <span className="flex items-center gap-2 text-slate-500 [&>svg]:shrink-0">
+              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${statStyles[i].iconBg} ${statStyles[i].iconColor} [&>svg]:h-4 [&>svg]:w-4`}>
+                {stat.icon}
+              </span>
               <span className="text-xs font-medium uppercase tracking-wider">{stat.label}</span>
             </span>
-            <span className="text-2xl font-bold text-slate-900">{stat.value}</span>
+            <span className="text-2xl font-bold tabular-nums text-slate-900">{stat.value}</span>
           </div>
         ))}
       </div>
 
       {/* Activity section - tabs for Posts & Comments */}
-      <div id="posts" className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-6">
+      <div id="posts" className="mt-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/50">
+        <div className="border-b border-slate-200/80 bg-slate-50/50 px-6">
           <h2 className="py-4 text-lg font-semibold text-slate-900">Activity</h2>
         </div>
 
@@ -233,18 +261,45 @@ export default async function ProfilePage({
           {/* Recent posts */}
           <div className="p-6">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-slate-500">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                />
-              </svg>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  />
+                </svg>
+              </span>
               Recent submissions
             </h3>
             {profile.recentPosts.length === 0 ? (
-              <p className="text-sm text-slate-500">No submissions yet.</p>
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-12 px-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200/80 text-slate-400">
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                </div>
+                <p className="mt-3 text-sm font-medium text-slate-600">No submissions yet</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {isOwnProfile ? (
+                    <>Share your first thread, article, or product review.</>
+                  ) : (
+                    <>{profile.username} hasn&apos;t posted anything yet.</>
+                  )}
+                </p>
+                {isOwnProfile && (
+                  <Link
+                    href="/threads"
+                    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+                  >
+                    Start a discussion
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </Link>
+                )}
+              </div>
             ) : (
               <ul className="space-y-3">
                 {profile.recentPosts.map((post) => (
@@ -289,18 +344,45 @@ export default async function ProfilePage({
           {/* Recent comments */}
           <div className="p-6">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-slate-500">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                />
-              </svg>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                  />
+                </svg>
+              </span>
               Recent comments
             </h3>
             {profile.recentComments.length === 0 ? (
-              <p className="text-sm text-slate-500">No comments yet.</p>
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 py-12 px-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200/80 text-slate-400">
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                  </svg>
+                </div>
+                <p className="mt-3 text-sm font-medium text-slate-600">No comments yet</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {isOwnProfile ? (
+                    <>Jump into a discussion and share your thoughts.</>
+                  ) : (
+                    <>{profile.username} hasn&apos;t commented yet.</>
+                  )}
+                </p>
+                {isOwnProfile && (
+                  <Link
+                    href="/threads"
+                    className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    Browse discussions
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                )}
+              </div>
             ) : (
               <ul className="space-y-4">
                 {profile.recentComments.map((comment) => (
