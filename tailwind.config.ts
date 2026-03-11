@@ -30,10 +30,10 @@ const config: Config = {
           muted: "#ff615420",
         },
         header: {
-          green: "#0d4d2b",
-          greenDark: "#083d22",
-          navy: "#1e3a5f",
-          navyDark: "#152a45",
+          green: "#1b9c43",
+          greenDark: "#158a3a",
+          navy: "#0e2236",
+          navyDark: "#0a1928",
         },
         felt: {
           DEFAULT: "#0d4d2b",

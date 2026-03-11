@@ -98,13 +98,13 @@ export function ProductsIndex() {
 
   return (
     <div className="mt-8 min-w-0">
-      <div className="mb-6 flex flex-wrap justify-end gap-3 sm:gap-4">
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         <div>
           <label className="sr-only">Sort by</label>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="top">Top</option>
             <option value="new">New</option>
@@ -116,7 +116,7 @@ export function ProductsIndex() {
           <select
             value={type}
             onChange={(e) => handleTypeChange(e.target.value as TypeFilter)}
-            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="all">All Types</option>
             <option value="sportsbook">Sportsbook</option>

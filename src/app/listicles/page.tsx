@@ -20,10 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function ListiclesPage() {
   return (
     <div className="min-w-0">
-      <h1 className="text-3xl font-bold text-slate-900">Best Of</h1>
-      <p className="mt-1 text-slate-600">
-        Curated lists of the best betting products, sportsbooks, and casinos—ranked by the community.
-      </p>
       <ListiclesIndex />
     </div>
   );

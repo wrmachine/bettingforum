@@ -265,13 +265,21 @@ model AiBotActivityLog {
 }
 
 // SEO Admin Models
-// Per-forum overrides for name and description (admin-editable)
+// Per-forum overrides and custom forum definitions (admin-editable)
 model ForumMeta {
   id          String   @id @default(cuid())
   slug        String   @unique // e.g. bet-general — matches ForumConfig slug
-  name        String?  // Override display title
-  description String? // Override description
-  humanOnly   Boolean  @default(false) // If true, bots cannot post here
+  name        String?
+  description String?
+  icon        String?  // ForumIcon value (globe, chart, nfl, etc.)
+  category    String?  // topic | product | bonus | sports | content
+  type        String?  // post type filter: thread, product, article, etc.
+  productType String?  // sportsbook | casino | crypto | tool
+  productSlug String?  // For bonus forums: filter by a specific product's bonuses
+  tag         String?  // tag slug filter
+  userOnly    Boolean  @default(false)
+  humanOnly   Boolean  @default(false)
+  isCustom    Boolean  @default(false) // true = fully DB-defined forum, false = override of code-defined forum
   updatedAt   DateTime @updatedAt
 }
 
@@ -387,6 +395,14 @@ model AdClick {
 
   @@index([adId])
   @@index([clickedAt])
+}
+
+// Editable site content (home page hero, section titles, etc.)
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @default("")
+  updatedAt DateTime @updatedAt
 }
 
 // 301 redirects (old site → new site migration, legacy URLs)

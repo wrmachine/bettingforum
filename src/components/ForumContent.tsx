@@ -48,6 +48,7 @@ export function ForumContent({ forum }: { forum: ForumConfig }) {
       params.set("type", forum.type);
     }
     if (forum.tag) params.set("tag", forum.tag);
+    if (forum.productSlug) params.set("productSlug", forum.productSlug);
     if (forum.userOnly) params.set("authorRole", "user");
     // All topic/sports forums with threads: filter by forum so threads belong to this board
     if (forum.type === "thread") params.set("forum", forum.slug);
@@ -63,7 +64,7 @@ export function ForumContent({ forum }: { forum: ForumConfig }) {
       })
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, [forum.slug, forum.type, forum.tag, forum.productType, forum.userOnly, sort]);
+  }, [forum.slug, forum.type, forum.tag, forum.productType, forum.productSlug, forum.userOnly, sort]);
 
   return (
     <div className="mt-6">

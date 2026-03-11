@@ -34,19 +34,19 @@ export function PageHeader({
 
   return (
     <header className="w-full">
-      {/* Dark header section - full viewport width background */}
-      <div className="w-screen bg-slate-900" style={{ marginLeft: "calc(50% - 50vw)" }}>
-        <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl">
+      {/* Header section - full viewport width */}
+      <div className="w-screen" style={{ marginLeft: "calc(50% - 50vw)" }}>
+        <div className="mx-auto max-w-[1280px] px-4 py-3 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold uppercase tracking-tight text-black sm:text-3xl">
             {title}
           </h1>
           {description && (
-            <div className="mt-3 text-sm text-white/90 [&_a]:text-blue-400 [&_a]:underline [&_a]:hover:text-blue-300">
+            <div className="mt-3 text-sm text-slate-700 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800">
               {description}
             </div>
           )}
           {hasMetadata && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-white">
+            <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-black">
               {author && (
                 <>
                   {avatarUrl ? (
@@ -57,14 +57,14 @@ export function PageHeader({
                       className="h-8 w-8 shrink-0 rounded-full object-cover"
                     />
                   ) : (
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-black">
                       {author.charAt(0).toUpperCase()}
                     </span>
                   )}
                   {authorUrl ? (
                     <Link
                       href={authorUrl}
-                      className="text-blue-400 underline hover:text-blue-300"
+                      className="text-blue-600 underline hover:text-blue-800"
                     >
                       {author}
                     </Link>
@@ -78,13 +78,13 @@ export function PageHeader({
               )}
               {role && <span>{role}</span>}
               {role && date && <span className="text-slate-400">|</span>}
-              {date && <span className="text-slate-300">{date}</span>}
+              {date && <span className="text-slate-500">{date}</span>}
               {factChecked && (
                 <>
                   {(role || date) && <span className="text-slate-400">|</span>}
                   <Link
                     href="/help#fact-checking"
-                    className="inline-flex items-center gap-1.5 text-blue-400 underline hover:text-blue-300"
+                    className="inline-flex items-center gap-1.5 text-blue-600 underline hover:text-blue-800"
                   >
                     Fact checked
                     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-500">
@@ -109,14 +109,9 @@ export function PageHeader({
         </div>
       </div>
 
-      {/* Separator - full viewport width (only when intro follows) */}
+      {/* Intro paragraph - full viewport width */}
       {intro && (
-        <div className="w-screen border-t border-slate-300" style={{ marginLeft: "calc(50% - 50vw)" }} />
-      )}
-
-      {/* Intro paragraph - full viewport width background */}
-      {intro && (
-        <div className="w-screen bg-white" style={{ marginLeft: "calc(50% - 50vw)" }}>
+        <div className="w-screen" style={{ marginLeft: "calc(50% - 50vw)" }}>
           <div className="mx-auto max-w-[1280px] px-4 py-4 sm:px-6 lg:px-8">
             <div className="prose prose-slate max-w-none text-slate-700 prose-p:my-3 prose-p:leading-relaxed [&_strong]:font-semibold [&_strong]:text-slate-900">
               {intro}

@@ -10,13 +10,13 @@ export default async function BonusesLayout({
 }) {
   const forums = await getForumsWithOverrides();
   return (
-    <div className="flex flex-col" data-section="bonuses">
-      <BonusesPageHeader />
-      <div className="mt-8 flex gap-8">
-        <MobileSidebarDrawer>
-          <ForumSidebar forums={forums} />
-        </MobileSidebarDrawer>
-        <div className="min-w-0 flex-1">{children}</div>
+    <div className="flex gap-8 pt-[50px]" data-section="bonuses">
+      <MobileSidebarDrawer>
+        <ForumSidebar forums={forums} />
+      </MobileSidebarDrawer>
+      <div className="min-w-0 flex-1">
+        <BonusesPageHeader />
+        {children}
       </div>
     </div>
   );

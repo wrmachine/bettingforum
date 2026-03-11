@@ -35,6 +35,8 @@ export interface ForumConfig {
   type?: string;
   /** API filter: product type when type=product (sportsbook, casino, crypto, tool) */
   productType?: string;
+  /** API filter: product slug — for bonus forums scoped to a specific product's bonuses */
+  productSlug?: string;
   /** API filter: tag slug for topic forums (strategy, ama, introduce, promotions) */
   tag?: string;
   /** When true, only show posts from regular users (exclude admin/editorial content) */
@@ -266,25 +268,44 @@ export function getForumBySlug(slug: string): ForumConfig | undefined {
   return FORUM_CONFIGS.find((f) => f.slug === slug);
 }
 
-/** DB overrides for forum name/description — used by getForumBySlugWithOverrides etc. */
-export async function getForumOverrides(): Promise<Map<string, { name?: string; description?: string }>> {
+/** Fetch all ForumMeta rows from DB (overrides + custom forums). */
+async function getForumMetaRows() {
   try {
     const { prisma } = await import("./prisma");
-    const rows = await prisma.forumMeta.findMany();
-    const map = new Map<string, { name?: string; description?: string }>();
-    for (const r of rows) {
-      map.set(r.slug, {
-        name: r.name ?? undefined,
-        description: r.description ?? undefined,
-      });
-    }
-    return map;
+    return await prisma.forumMeta.findMany();
   } catch {
-    return new Map();
+    return [];
   }
 }
 
-/** Merge a forum config with optional overrides. */
+/** Convert a custom ForumMeta DB row into a ForumConfig. */
+function customMetaToConfig(row: {
+  slug: string;
+  name: string | null;
+  description: string | null;
+  icon: string | null;
+  category: string | null;
+  type: string | null;
+  productType: string | null;
+  productSlug: string | null;
+  tag: string | null;
+  userOnly: boolean;
+}): ForumConfig {
+  return {
+    slug: row.slug,
+    name: row.name || row.slug,
+    description: row.description || "",
+    icon: (row.icon as ForumIcon) || "globe",
+    category: (row.category as ForumConfig["category"]) || "topic",
+    type: row.type || "thread",
+    productType: row.productType || undefined,
+    productSlug: row.productSlug || undefined,
+    tag: row.tag || undefined,
+    userOnly: row.userOnly,
+  };
+}
+
+/** Merge a code-defined forum config with optional DB overrides. */
 export function mergeForumWithOverrides(
   forum: ForumConfig,
   overrides: Map<string, { name?: string; description?: string }>
@@ -298,18 +319,49 @@ export function mergeForumWithOverrides(
   };
 }
 
-/** Like getForumBySlug but with DB overrides applied. */
+/** Like getForumBySlug but includes DB overrides and custom forums. */
 export async function getForumBySlugWithOverrides(slug: string): Promise<ForumConfig | undefined> {
-  const forum = getForumBySlug(slug);
-  if (!forum) return undefined;
-  const overrides = await getForumOverrides();
-  return mergeForumWithOverrides(forum, overrides);
+  const rows = await getForumMetaRows();
+
+  const codeForum = getForumBySlug(slug);
+  if (codeForum) {
+    const row = rows.find((r) => r.slug === slug && !r.isCustom);
+    if (row) {
+      return {
+        ...codeForum,
+        name: row.name?.trim() || codeForum.name,
+        description: row.description?.trim() || codeForum.description,
+      };
+    }
+    return codeForum;
+  }
+
+  const customRow = rows.find((r) => r.slug === slug && r.isCustom);
+  if (customRow) return customMetaToConfig(customRow);
+
+  return undefined;
 }
 
-/** Like getTopicForums etc. but with DB overrides applied. */
+/** All forums: code-defined (with DB overrides) + custom DB forums. */
 export async function getForumsWithOverrides(): Promise<ForumConfig[]> {
-  const overrides = await getForumOverrides();
-  return FORUM_CONFIGS.map((f) => mergeForumWithOverrides(f, overrides));
+  const rows = await getForumMetaRows();
+
+  const overrideMap = new Map<string, { name?: string; description?: string }>();
+  const customForums: ForumConfig[] = [];
+
+  for (const r of rows) {
+    if (r.isCustom) {
+      customForums.push(customMetaToConfig(r));
+    } else {
+      overrideMap.set(r.slug, {
+        name: r.name ?? undefined,
+        description: r.description ?? undefined,
+      });
+    }
+  }
+
+  const merged = FORUM_CONFIGS.map((f) => mergeForumWithOverrides(f, overrideMap));
+  return [...merged, ...customForums];
 }
 
 export function getTopicForums(): ForumConfig[] {

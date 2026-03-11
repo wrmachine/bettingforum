@@ -122,7 +122,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 shadow-md">
+    <header className="sticky top-0 z-50">
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
@@ -280,7 +280,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Bottom bar - dark navy (hidden on mobile, in mobile menu) */}
+      {/* Bottom bar - green (hidden on mobile, in mobile menu) */}
       <div ref={dropdownRef} className="hidden bg-header-navy md:block">
         <div className="mx-auto flex max-w-[1280px] items-center gap-6 px-4 py-2.5 sm:px-6">
           {secondaryNav
@@ -304,14 +304,14 @@ export function Navbar() {
                     </svg>
                   </button>
                   <div
-                    className={`absolute left-0 top-full mt-1 min-w-[160px] rounded-md border border-slate-700 bg-header-navyDark py-2 shadow-lg ${openDropdownId === item.id ? "block" : "hidden"}`}
+                    className={`absolute left-0 top-full mt-1 min-w-[160px] rounded-md bg-header-navyDark py-2 shadow-lg ${openDropdownId === item.id ? "block" : "hidden"}`}
                   >
                     {item.children.map((child) => (
                       <Link
                         key={child.id}
                         href={child.href}
                         onClick={() => setOpenDropdownId(null)}
-                        className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                        className="block px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white"
                       >
                         {child.label}
                       </Link>

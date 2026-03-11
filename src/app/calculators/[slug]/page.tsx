@@ -91,7 +91,7 @@ export default async function CalculatorPage({
           title={calc.name}
           description={calc.description}
         />
-        <div className="mt-6 flex flex-col gap-8 lg:flex-row">
+        <div className="mt-6 flex flex-col gap-8 pt-[50px] lg:flex-row">
           <div className="min-w-0 flex-1">
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
               <CalcComponent />

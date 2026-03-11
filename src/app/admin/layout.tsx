@@ -28,6 +28,12 @@ export default function AdminLayout({
           <div>
             <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Content</p>
             <Link
+              href="/admin/home-page"
+              className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            >
+              Home Page
+            </Link>
+            <Link
               href="/admin/posts"
               className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >

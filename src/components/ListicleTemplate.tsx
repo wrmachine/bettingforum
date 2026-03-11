@@ -67,7 +67,7 @@ export function ListicleTemplate({ items }: ListicleTemplateProps) {
                       {bonusText}
                     </h3>
                     {item.product.shortDescription && (
-                      <p className="mt-1 text-sm text-slate-600">{item.product.shortDescription}</p>
+                      <div className="mt-1 text-sm text-slate-600 [&_p]:m-0" dangerouslySetInnerHTML={{ __html: item.product.shortDescription }} />
                     )}
                   </div>
 

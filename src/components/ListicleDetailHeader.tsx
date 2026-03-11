@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PageHeader } from "./PageHeader";
 
 interface ListiclePost {
   title: string;
@@ -59,15 +58,17 @@ export function ListicleDetailHeader() {
     });
 
   return (
-    <div>
-      <PageHeader
-        title={title}
-      author="Betting Forum"
-      authorUrl="/"
-      role={post.author?.username ? `by ${post.author.username}` : undefined}
-      date={formattedDate ?? undefined}
-      factChecked
-    />
-    </div>
+    <header className="mb-6">
+      <h1 className="text-2xl font-bold uppercase tracking-tight text-black sm:text-3xl">
+        {title}
+      </h1>
+      {(post.author?.username || formattedDate) && (
+        <p className="mt-2 text-sm text-slate-500">
+          {post.author?.username && <span>by {post.author.username}</span>}
+          {post.author?.username && formattedDate && <span className="mx-1">·</span>}
+          {formattedDate && <span>{formattedDate}</span>}
+        </p>
+      )}
+    </header>
   );
 }

@@ -11,14 +11,14 @@ export default async function ListiclesLayout({
 }) {
   const forums = await getForumsWithOverrides();
   return (
-    <div className="flex flex-col" data-section="listicles">
-      <ListiclesPageHeader />
-      <ListicleDetailHeader />
-      <div className="mt-8 flex gap-8">
-        <MobileSidebarDrawer>
-          <ForumSidebar forums={forums} />
-        </MobileSidebarDrawer>
-        <div className="min-w-0 flex-1">{children}</div>
+    <div className="flex gap-8 pt-[50px]" data-section="listicles">
+      <MobileSidebarDrawer>
+        <ForumSidebar forums={forums} />
+      </MobileSidebarDrawer>
+      <div className="min-w-0 flex-1">
+        <ListiclesPageHeader />
+        <ListicleDetailHeader />
+        {children}
       </div>
     </div>
   );

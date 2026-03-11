@@ -5,7 +5,7 @@ import { getForumsWithOverrides } from "@/lib/forums";
 export default async function ForumsLayout({ children }: { children: React.ReactNode }) {
   const forums = await getForumsWithOverrides();
   return (
-    <div className="flex gap-8">
+    <div className="flex gap-8 pt-[50px]">
       <MobileSidebarDrawer>
         <ForumSidebar forums={forums} />
       </MobileSidebarDrawer>

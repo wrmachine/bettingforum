@@ -12,7 +12,7 @@ export function LayoutShell({ children }: LayoutShellProps) {
     <div className="min-h-screen bg-slate-50">
       <div className="relative min-h-screen">
         <Navbar />
-        <main className="mx-auto max-w-[1280px] px-4 py-8 sm:px-6">
+        <main className="mx-auto max-w-[1280px] px-4 py-4 sm:px-6">
           {children}
         </main>
         <FooterDirectory />

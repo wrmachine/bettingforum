@@ -202,21 +202,24 @@ export function FooterDirectory() {
 
         {/* Affiliate Disclosure row */}
         <div className="mt-6 border-t border-slate-200 pt-6">
+          <Link href="/responsible" className="text-sm font-medium text-slate-700 hover:text-felt">
+            Responsible Betting
+          </Link>
+          <p className="mt-2 text-xs leading-relaxed text-slate-500">
+            In compliance with responsible gambling standards, our platform enforces strict regulations to prevent individuals under the age of 21 from participating in any form of gambling. This commitment is reflected prominently on our website, where clear statements outline the prohibition of underage participation and emphasize the legal consequences associated with such actions. Before engaging in any gambling activities, users are required to affirm their legal age, ensuring compliance with regulations and safeguarding against underage involvement.
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-slate-500">
+            To uphold these standards effectively, we conduct regular reviews of our age verification systems, assessing their robustness and updating them as needed to maintain efficacy. Furthermore, our dedication extends to comprehensive staff training, where all relevant team members are equipped with the necessary knowledge and skills to enforce age restrictions consistently. Through these measures, we strive to promote responsible gambling practices, protect vulnerable individuals, and uphold the integrity of our platform.
+          </p>
+        </div>
+
+        {/* Affiliate Disclosure row */}
+        <div className="mt-6 border-t border-slate-200 pt-6">
           <Link href="/affiliate-disclosure" className="text-sm font-medium text-slate-700 hover:text-felt">
             Affiliate Disclosure
           </Link>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             We may earn a commission when you sign up through our links. This does not affect our editorial independence.
-          </p>
-        </div>
-
-        {/* Responsible Betting row */}
-        <div className="mt-6 border-t border-slate-200 pt-6">
-          <Link href="/responsible" className="text-sm font-medium text-slate-700 hover:text-felt">
-            Responsible Betting
-          </Link>
-          <p className="mt-1 text-xs leading-relaxed text-slate-500">
-            21+ only. Gambling can be addictive. Please gamble responsibly. Set deposit limits and never chase losses.
           </p>
         </div>
       </div>

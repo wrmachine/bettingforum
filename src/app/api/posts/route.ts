@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get("tag"); // tag slug for filtering (e.g. strategy, ama)
     const forum = searchParams.get("forum"); // forum slug (e.g. bet-general) — threads belong to a forum
     const authorRole = searchParams.get("authorRole"); // "user" = only posts from non-admin users
+    const productSlug = searchParams.get("productSlug"); // bonus forums: filter by product
     const timeRange = searchParams.get("timeRange");
     const sortParam = searchParams.get("sort") ?? "top";
     const q = searchParams.get("q")?.trim(); // text search: title, excerpt, body
@@ -50,6 +51,10 @@ export async function GET(request: NextRequest) {
 
     if (tag) {
       where.postTags = { some: { tag: { slug: tag } } };
+    }
+
+    if (productSlug) {
+      where.bonus = { is: { product: { is: { post: { slug: productSlug } } } } };
     }
 
     // Thread forums: show threads with forumSlug match, or null (legacy) for topic/sports forums

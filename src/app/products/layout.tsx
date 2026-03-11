@@ -33,9 +33,10 @@ export default function ProductsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col" data-section="products">
-      <ProductsPageHeader />
-      <ProductsLayoutContent>{children}</ProductsLayoutContent>
+    <div data-section="products">
+      <ProductsLayoutContent header={<ProductsPageHeader />}>
+        {children}
+      </ProductsLayoutContent>
     </div>
   );
 }
