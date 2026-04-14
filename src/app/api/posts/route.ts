@@ -4,6 +4,7 @@ import { sumVotes } from "@/lib/vote-sum";
 import { generateSlug } from "@/lib/slug";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { autoSubmitUrl } from "@/lib/rapid-indexer";
 
 export async function GET(request: NextRequest) {
   try {
@@ -343,6 +344,8 @@ export async function POST(request: NextRequest) {
       await prisma.postTag.createMany({ data: tagData });
     }
   }
+
+  autoSubmitUrl(typeStr, slug, titleStr);
 
   return NextResponse.json(post);
   } catch (err) {

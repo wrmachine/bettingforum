@@ -15,6 +15,10 @@ export type AiBotProfileWithUser = {
   maxResponsesPerHour: number;
   maxResponsesPerDay: number;
   enabled: boolean;
+  defaultForumSlug: string | null;
+  appendPartnerLinks: boolean;
+  /** When set, bot only runs sports digest for this key — not general forum automation */
+  digestSportKey: string | null;
   user: { id: string; username: string };
 };
 
@@ -33,9 +37,29 @@ export async function getEnabledBots(): Promise<AiBotProfileWithUser[]> {
   return bots as AiBotProfileWithUser[];
 }
 
+/**
+ * Bots that participate in general forum automation (new-thread comments, replies, proactive threads).
+ * Digest-only bots (`digestSportKey` set) are excluded.
+ */
+export async function getEnabledBotsForForumEngagement(): Promise<
+  AiBotProfileWithUser[]
+> {
+  const bots = await prisma.aiBotProfile.findMany({
+    where: { enabled: true, digestSportKey: null },
+    include: { user: { select: { id: true, username: true } } },
+  });
+  return bots as AiBotProfileWithUser[];
+}
+
 /** Get bot user IDs for exclusion (bot-on-bot prevention) */
 export async function getBotUserIds(): Promise<Set<string>> {
   const bots = await getEnabledBots();
+  return new Set(bots.map((b) => b.userId));
+}
+
+/** Bot user IDs for forum engagement only (excludes digest-only bots) */
+export async function getBotUserIdsForForumEngagement(): Promise<Set<string>> {
+  const bots = await getEnabledBotsForForumEngagement();
   return new Set(bots.map((b) => b.userId));
 }
 

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 export interface BonusCardProps {
+  /** When true, omit outer border for use inside a bordered list with divide-y (bonuses index). */
+  stack?: boolean;
   bonus: {
     id: string;
     title: string;
@@ -23,7 +25,7 @@ export interface BonusCardProps {
   };
 }
 
-export function BonusCard({ bonus }: BonusCardProps) {
+export function BonusCard({ bonus, stack }: BonusCardProps) {
   const [copied, setCopied] = useState(false);
 
   const copyPromo = (e: React.MouseEvent) => {
@@ -41,7 +43,9 @@ export function BonusCard({ bonus }: BonusCardProps) {
   const bonusText = bonus.offerValue || bonus.title;
 
   return (
-    <article className="group relative min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+    <article
+      className={`group relative min-w-0 overflow-hidden rounded-none bg-white transition hover:bg-slate-50/80 ${stack ? "" : "border border-slate-200"}`}
+    >
       <div className="flex min-h-[120px] flex-col lg:min-h-[140px] lg:flex-row">
         {/* Left: Casino logo or brand name on dark blue-gray panel (~18-20% width) */}
         <div className="flex w-full shrink-0 items-center justify-center bg-[#2D3748] px-4 py-6 lg:w-[20%] lg:min-w-[140px]">
@@ -100,7 +104,7 @@ export function BonusCard({ bonus }: BonusCardProps) {
               href={claimUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg bg-red-600 px-5 py-2.5 text-center text-sm font-bold uppercase text-white transition hover:bg-red-700"
+              className="inline-flex min-w-[10rem] items-center justify-center rounded-none bg-[#FF8021] px-8 py-3 text-center text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[#E6731D]"
             >
               Play Now
             </a>

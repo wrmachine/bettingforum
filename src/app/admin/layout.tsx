@@ -91,6 +91,12 @@ export default function AdminLayout({
               Schema
             </Link>
             <Link
+              href="/admin/seo/indexing"
+              className="block rounded px-3 py-2 pl-6 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+            >
+              Rapid Indexer
+            </Link>
+            <Link
               href="/admin/redirects"
               className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
@@ -140,6 +146,18 @@ export default function AdminLayout({
               className="block rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
               AI Bots
+            </Link>
+            <Link
+              href="/admin/partner-sportsbooks"
+              className="block rounded px-3 py-2 pl-6 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+            >
+              Partner sportsbooks
+            </Link>
+            <Link
+              href="/admin/sports-digest"
+              className="block rounded px-3 py-2 pl-6 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+            >
+              Sports digest
             </Link>
             <Link
               href="/admin/ai-bots/new"

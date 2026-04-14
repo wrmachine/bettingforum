@@ -28,7 +28,7 @@ export default function GlobalError({
             backgroundColor: "#ff6154",
             color: "white",
             border: "none",
-            borderRadius: "0.5rem",
+            borderRadius: 0,
             cursor: "pointer",
             fontWeight: 500,
           }}

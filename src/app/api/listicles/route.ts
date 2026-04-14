@@ -52,5 +52,10 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  {
+    const { autoSubmitUrl } = await import("@/lib/rapid-indexer");
+    autoSubmitUrl("listicle", post.slug, String(title));
+  }
+
   return NextResponse.json(post);
 }

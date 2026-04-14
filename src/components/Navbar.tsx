@@ -156,8 +156,8 @@ export function Navbar() {
 
       {/* Top bar - bright green */}
       <div className="bg-header-green">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-4 py-3 sm:px-6 md:flex-row md:items-center md:justify-between md:gap-0">
+          <div className="order-2 flex items-center gap-2 md:order-1">
             <button
               type="button"
               onClick={() => setMobileMenuOpen((o) => !o)}
@@ -175,7 +175,7 @@ export function Navbar() {
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="order-3 hidden items-center gap-8 md:order-2 md:flex">
             {mainNav
               .filter((item) => item.label.toLowerCase() !== "news")
               .map((item) => (
@@ -189,7 +189,7 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="order-1 flex items-center justify-end gap-2 sm:gap-4 md:order-3 md:justify-start">
             <Link
               href="/search"
               className="hidden text-white hover:text-white/90 md:inline-flex"
@@ -264,13 +264,13 @@ export function Navbar() {
               <>
                 <Link
                   href="/auth/sign-in"
-                  className="text-sm font-medium text-white hover:text-white/90"
+                  className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white hover:bg-white/10 hover:text-white/90"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/auth/sign-up"
-                  className="rounded-md bg-white px-4 py-2 text-sm font-medium text-header-green hover:bg-white/90"
+                  className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-header-green hover:bg-white/90"
                 >
                   Sign up
                 </Link>

@@ -22,7 +22,12 @@ interface ListicleDetailProps {
           id: string;
           brandName: string;
           shortDescription?: string | null;
+          bonusSummary?: string | null;
+          logoUrl?: string | null;
+          siteUrl?: string | null;
           post: { slug: string };
+          bonuses?: { promoCode: string | null; featured: boolean }[];
+          reviews?: { rating: number }[];
         };
       }[];
     };

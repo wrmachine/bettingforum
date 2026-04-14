@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
+import { SPORT_DIGEST_REGISTRY } from "@/lib/sports-digest/registry";
+
+const VALID_DIGEST_KEYS = new Set(SPORT_DIGEST_REGISTRY.map((r) => r.sportKey));
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -29,6 +32,9 @@ export async function POST(request: NextRequest) {
     allowedForums?: string[];
     maxResponsesPerHour?: number;
     maxResponsesPerDay?: number;
+    defaultForumSlug?: string | null;
+    appendPartnerLinks?: boolean;
+    digestSportKey?: string | null;
   };
   try {
     body = await request.json();
@@ -72,6 +78,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const dSlug = String(body.defaultForumSlug ?? "").trim();
+    let digestKey: string | null =
+      body.digestSportKey != null && String(body.digestSportKey).trim() !== ""
+        ? String(body.digestSportKey).trim().toLowerCase()
+        : null;
+    if (digestKey && !VALID_DIGEST_KEYS.has(digestKey)) {
+      return NextResponse.json(
+        { error: `Invalid digest sport key: ${digestKey}` },
+        { status: 400 }
+      );
+    }
+
     const profile = await prisma.aiBotProfile.create({
       data: {
         userId: user.id,
@@ -85,6 +103,9 @@ export async function POST(request: NextRequest) {
           : null,
         maxResponsesPerHour: body.maxResponsesPerHour ?? 10,
         maxResponsesPerDay: body.maxResponsesPerDay ?? 50,
+        defaultForumSlug: dSlug.length ? dSlug : null,
+        appendPartnerLinks: body.appendPartnerLinks ?? true,
+        digestSportKey: digestKey,
       },
       include: { user: { select: { id: true, username: true, email: true } } },
     });

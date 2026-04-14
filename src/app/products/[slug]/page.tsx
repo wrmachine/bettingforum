@@ -4,45 +4,37 @@ import { ProductDetail } from "@/components/ProductDetail";
 import { buildMetadata, buildProductSchema, buildBreadcrumbSchema, getSchemaEnabled } from "@/lib/seo";
 import { getBaseUrl } from "@/lib/base-url";
 import { SchemaJsonLd } from "@/components/SchemaJsonLd";
-
-async function getProduct(slug: string) {
-  try {
-    const base = await getBaseUrl();
-    const res = await fetch(`${base}/api/posts/${slug}`, { cache: "no-store" });
-    if (!res.ok) return null;
-    const text = await res.text();
-    if (text.startsWith("<")) return null;
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
-}
+import { getPostBySlug } from "@/lib/post-data";
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getProduct(slug);
-  if (!post || post.type !== "product") return {};
-  const path = `/products/${slug}`;
-  const meta = await buildMetadata(path, {
-    title: post.title,
-    description: post.excerpt ?? post.title,
-    ogImage: post.product?.logoUrl,
-    articleAuthor: post.author?.username,
-    articlePublishedTime: post.createdAt,
-  });
-  return {
-    title: meta.title,
-    description: meta.description,
-    keywords: meta.keywords,
-    openGraph: meta.openGraph,
-    twitter: meta.twitter,
-    robots: meta.robots,
-    alternates: meta.alternates,
-  };
+  try {
+    const { slug } = await params;
+    const post = await getPostBySlug(slug);
+    if (!post || post.type !== "product") return {};
+    const path = `/products/${slug}`;
+    const meta = await buildMetadata(path, {
+      title: post.title,
+      description: post.excerpt ?? post.title,
+      ogImage: post.product?.logoUrl,
+      articleAuthor: post.author?.username,
+      articlePublishedTime: post.createdAt,
+    });
+    return {
+      title: meta.title,
+      description: meta.description,
+      keywords: meta.keywords,
+      openGraph: meta.openGraph,
+      twitter: meta.twitter,
+      robots: meta.robots,
+      alternates: meta.alternates,
+    };
+  } catch {
+    return { title: "Product – Betting Forum" };
+  }
 }
 
 export default async function ProductPage({
@@ -53,7 +45,7 @@ export default async function ProductPage({
   const { slug } = await params;
   let post;
   try {
-    post = await getProduct(slug);
+    post = await getPostBySlug(slug);
   } catch (err) {
     console.error("ProductPage getProduct error:", err);
     notFound();

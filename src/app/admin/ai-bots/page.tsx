@@ -21,7 +21,11 @@ export default function AdminAiBotsPage() {
   const runNow = () => {
     setRunning(true);
     setRunResult(null);
-    fetch("/api/cron/ai-bots?force=1")
+    fetch("/api/admin/cron-run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ job: "ai-bots", force: true }),
+    })
       .then((r) => r.json())
       .then((data) => setRunResult(data))
       .catch((err) => setRunResult({ error: err.message }))

@@ -244,6 +244,12 @@ model AiBotProfile {
   maxResponsesPerHour Int      @default(10)
   maxResponsesPerDay  Int      @default(50)
   enabled             Boolean  @default(true)
+  // Default forum for proactive threads (e.g. sport-mlb); cron falls back to bet-general if null.
+  defaultForumSlug    String?
+  // Append partner sportsbook link block to generated comments when configured site-wide.
+  appendPartnerLinks  Boolean  @default(true)
+  // When set (e.g. mlb), this bot ONLY posts that sport's daily digest — excluded from general forum cron.
+  digestSportKey      String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

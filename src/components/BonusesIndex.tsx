@@ -155,9 +155,9 @@ export function BonusesIndex() {
       ) : bonuses.length === 0 && !error ? (
         <p className="text-slate-500">No bonuses yet. Be the first to submit one!</p>
       ) : (
-        <div className="flex flex-col gap-4 rounded-xl bg-[#F2F4F7] p-4">
+        <div className="flex flex-col divide-y divide-slate-200 overflow-hidden rounded-none border border-slate-200 bg-white">
           {bonuses.map((bonus) => (
-            <BonusCard key={bonus.id} bonus={bonus} />
+            <BonusCard key={bonus.id} stack bonus={bonus} />
           ))}
         </div>
       )}

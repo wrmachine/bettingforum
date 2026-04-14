@@ -26,83 +26,83 @@ export function AccountWidget() {
   }, [session?.user?.id]);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-700">Account</h3>
+    <div className="rounded-none border border-slate-200 bg-white p-3 shadow-sm">
+        <h3 className="mb-2 text-xs font-semibold text-slate-700">Account</h3>
         {status === "loading" ? (
-          <div className="h-24 animate-pulse rounded bg-slate-100" />
+          <div className="h-[4.5rem] animate-pulse rounded-none bg-slate-100" />
         ) : session ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Link
               href={`/u/${stats?.username ?? (session.user as { username?: string })?.username ?? session.user?.name ?? session.user?.email ?? "me"}`}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
+              <span className="flex h-[1.875rem] w-[1.875rem] shrink-0 items-center justify-center rounded-full bg-slate-200 text-[0.65rem] font-semibold text-slate-600">
                 {(stats?.username ?? session.user?.name ?? "?")
                   .charAt(0)
                   .toUpperCase()}
               </span>
               <div className="min-w-0">
-                <p className="truncate font-medium text-slate-900">
+                <p className="truncate text-xs font-medium text-slate-900">
                   {stats?.username ?? session.user?.name ?? session.user?.email}
                 </p>
-                <p className="text-xs text-slate-500">View profile</p>
+                <p className="text-[0.65rem] text-slate-500">View profile</p>
               </div>
             </Link>
-            <div className="flex gap-4 border-t border-slate-100 pt-3">
-              <div className="flex items-center gap-1.5">
+            <div className="flex gap-3 border-t border-slate-100 pt-2">
+              <div className="flex items-center gap-1">
                 <svg
-                  className="h-4 w-4 text-emerald-500"
+                  className="h-3 w-3 text-emerald-500"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 4l8 8h-5v8h-6v-8H4l8-8z" />
                 </svg>
-                <span className="text-sm font-medium text-slate-700">
+                <span className="text-xs font-medium text-slate-700">
                   {stats?.upvotes ?? 0}
                 </span>
-                <span className="text-xs text-slate-500">upvotes</span>
+                <span className="text-[0.65rem] text-slate-500">upvotes</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 <svg
-                  className="h-4 w-4 text-red-500"
+                  className="h-3 w-3 text-red-500"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 20l-8-8h5V4h6v8h5l-8 8z" />
                 </svg>
-                <span className="text-sm font-medium text-slate-700">
+                <span className="text-xs font-medium text-slate-700">
                   {stats?.downvotes ?? 0}
                 </span>
-                <span className="text-xs text-slate-500">downvotes</span>
+                <span className="text-[0.65rem] text-slate-500">downvotes</span>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-1.5">
               <Link
                 href="/account"
-                className="flex-1 rounded-lg border border-slate-200 px-4 py-2 text-center text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                className="block w-full rounded-none border border-slate-200 px-3 py-1.5 text-center text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Account
               </Link>
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex-1 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                className="w-full rounded-none border border-slate-200 px-3 py-1.5 text-center text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Log out
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             <Link
               href="/auth/sign-in"
-              className="block w-full rounded-lg border border-slate-200 px-4 py-2 text-center text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              className="block w-full rounded-none border border-slate-200 px-3 py-1.5 text-center text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
               Log in
             </Link>
             <Link
               href="/auth/sign-up"
-              className="block w-full rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+              className="block w-full rounded-none bg-accent px-3 py-1.5 text-center text-xs font-medium text-white transition-colors hover:bg-accent-hover"
             >
               Sign up
             </Link>

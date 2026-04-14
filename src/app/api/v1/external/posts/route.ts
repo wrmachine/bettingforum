@@ -204,6 +204,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (status === "published") {
+      const { autoSubmitUrl } = await import("@/lib/rapid-indexer");
+      autoSubmitUrl(typeStr, post.slug, titleStr);
+    }
+
     return NextResponse.json({
       success: true,
       post: {

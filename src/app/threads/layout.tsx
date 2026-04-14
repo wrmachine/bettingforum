@@ -9,7 +9,7 @@ export default async function ThreadsLayout({
 }) {
   const forums = await getForumsWithOverrides();
   return (
-    <div className="flex gap-8 pt-[50px]">
+    <div className="flex gap-8 pt-[50px]" data-forum-route>
       <MobileSidebarDrawer>
         <ForumSidebar forums={forums} />
       </MobileSidebarDrawer>

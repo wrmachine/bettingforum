@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
+import { SPORT_DIGEST_REGISTRY } from "@/lib/sports-digest/registry";
+
+const VALID_DIGEST_KEYS = new Set(SPORT_DIGEST_REGISTRY.map((r) => r.sportKey));
 
 export async function GET(
   _request: NextRequest,
@@ -43,6 +46,9 @@ export async function PATCH(
     maxResponsesPerHour?: number;
     maxResponsesPerDay?: number;
     enabled?: boolean;
+    defaultForumSlug?: string | null;
+    appendPartnerLinks?: boolean;
+    digestSportKey?: string | null;
   };
   try {
     body = await request.json();
@@ -68,6 +74,27 @@ export async function PATCH(
   if (body.maxResponsesPerDay !== undefined)
     data.maxResponsesPerDay = Math.max(1, Math.min(500, Number(body.maxResponsesPerDay) || 50));
   if (body.enabled !== undefined) data.enabled = Boolean(body.enabled);
+  if (body.defaultForumSlug !== undefined) {
+    const s = String(body.defaultForumSlug).trim();
+    data.defaultForumSlug = s.length ? s : null;
+  }
+  if (body.appendPartnerLinks !== undefined)
+    data.appendPartnerLinks = Boolean(body.appendPartnerLinks);
+  if (body.digestSportKey !== undefined) {
+    const raw = body.digestSportKey;
+    if (raw === null || raw === "") {
+      data.digestSportKey = null;
+    } else {
+      const key = String(raw).trim().toLowerCase() || null;
+      if (key && !VALID_DIGEST_KEYS.has(key)) {
+        return NextResponse.json(
+          { error: `Invalid digest sport key: ${key}` },
+          { status: 400 }
+        );
+      }
+      data.digestSportKey = key;
+    }
+  }
 
   const updated = await prisma.aiBotProfile.update({
     where: { id },

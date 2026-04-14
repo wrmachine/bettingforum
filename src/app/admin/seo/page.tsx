@@ -41,6 +41,14 @@ export default function AdminSeoPage() {
             </p>
           </div>
         </Link>
+        <Link href="/admin/seo/indexing">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 transition hover:border-emerald-500 hover:shadow-md">
+            <h2 className="font-semibold text-gray-900">Rapid Indexer</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Submit URLs to Google for fast indexing via Rapid Indexer
+            </p>
+          </div>
+        </Link>
       </div>
     </div>
   );

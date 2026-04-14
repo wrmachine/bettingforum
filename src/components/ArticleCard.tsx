@@ -46,7 +46,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
   };
 
   return (
-    <article className="flex overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
+    <article className="flex overflow-hidden rounded-none border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
       {/* Up/Down vote column - on the left (matches ForumThreadCard, PostCard) */}
       <div className="flex w-10 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-slate-100 bg-slate-50/50 py-2">
         <button
@@ -78,7 +78,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
       <Link href={`/articles/${article.slug}`} className="min-w-0 flex-1">
         <div className="flex flex-col md:flex-row">
           {/* Featured image: full-width banner on mobile, square on desktop */}
-          <div className="aspect-video w-full shrink-0 overflow-hidden rounded-t-lg bg-slate-100 md:h-[10rem] md:w-[10rem] md:rounded-t-none md:rounded-l-sm md:aspect-auto">
+          <div className="aspect-video w-full shrink-0 overflow-hidden rounded-none bg-slate-100 md:h-[10rem] md:w-[10rem] md:aspect-auto">
             {article.featuredImageUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
@@ -114,7 +114,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
                   {article.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600"
+                      className="rounded-none bg-slate-100 px-1.5 py-0.5 text-slate-600"
                     >
                       {tag}
                     </span>

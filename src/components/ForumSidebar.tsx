@@ -138,7 +138,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onLinkClick}
-      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+      className={`flex items-center gap-3 rounded-lg px-3 py-[0.2rem] text-[0.7rem] transition-colors ${
         isMobile
           ? active
             ? "bg-slate-700/50 font-medium text-white"
@@ -194,7 +194,7 @@ export function ForumSidebar({
   const navLinkProps = { variant, onLinkClick };
 
   return (
-    <aside className={variant === "mobile" ? "shrink-0" : "w-56 shrink-0"}>
+    <aside className={variant === "mobile" ? "shrink-0" : "w-48 shrink-0"}>
       <nav className="space-y-6">
         {/* General navigation */}
         <div className="space-y-0.5">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { SPORT_DIGEST_REGISTRY } from "@/lib/sports-digest/registry";
 
 const ADJECTIVES = [
   "Lucky", "Wild", "Big", "Sharp", "Royal", "Golden", "Hot", "Ace", "Bold",
@@ -37,6 +38,9 @@ export default function AdminAiBotsNewPage() {
     systemPrompt: "",
     threadTopics: "",
     allowedForums: "",
+    defaultForumSlug: "",
+    appendPartnerLinks: true,
+    digestSportKey: "",
     maxResponsesPerHour: 10,
     maxResponsesPerDay: 50,
   });
@@ -72,6 +76,9 @@ export default function AdminAiBotsNewPage() {
           systemPrompt: form.systemPrompt.trim(),
           threadTopics: threadTopics.length ? threadTopics : undefined,
           allowedForums: allowedForums.length ? allowedForums : undefined,
+          defaultForumSlug: form.defaultForumSlug.trim() || null,
+          appendPartnerLinks: form.appendPartnerLinks,
+          digestSportKey: form.digestSportKey.trim() || null,
           maxResponsesPerHour: form.maxResponsesPerHour,
           maxResponsesPerDay: form.maxResponsesPerDay,
         }),
@@ -185,6 +192,60 @@ export default function AdminAiBotsNewPage() {
             placeholder="bet-general, bet-sportsbooks (leave empty for all)"
             className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            Digest-only sport (optional)
+          </label>
+          <select
+            value={form.digestSportKey}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, digestSportKey: e.target.value }))
+            }
+            className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
+          >
+            <option value="">No — general forum bot</option>
+            {SPORT_DIGEST_REGISTRY.map((r) => (
+              <option key={r.sportKey} value={r.sportKey}>
+                Only daily {r.displayName} digest posts
+              </option>
+            ))}
+          </select>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Digest-only bots do not run general comments, replies, or proactive threads.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            Default forum for proactive threads
+          </label>
+          <input
+            type="text"
+            value={form.defaultForumSlug}
+            onChange={(e) => setForm((f) => ({ ...f, defaultForumSlug: e.target.value }))}
+            placeholder="bet-general or sport-mlb"
+            className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
+          />
+          <p className="mt-0.5 text-xs text-slate-500">
+            Used when the cron creates a random proactive thread (empty = bet-general).
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="appendPartnerLinks"
+            checked={form.appendPartnerLinks}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, appendPartnerLinks: e.target.checked }))
+            }
+            className="h-4 w-4 rounded border-slate-300"
+          />
+          <label htmlFor="appendPartnerLinks" className="text-sm text-slate-700">
+            Append partner sportsbook link block to comments (configure under Partner sportsbooks)
+          </label>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

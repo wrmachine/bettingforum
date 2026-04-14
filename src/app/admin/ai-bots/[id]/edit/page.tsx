@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { SPORT_DIGEST_REGISTRY } from "@/lib/sports-digest/registry";
 
 type Bot = {
   id: string;
@@ -13,6 +14,9 @@ type Bot = {
   maxResponsesPerHour: number;
   maxResponsesPerDay: number;
   enabled: boolean;
+  defaultForumSlug: string | null;
+  appendPartnerLinks: boolean;
+  digestSportKey: string | null;
   user: { username: string; email: string };
 };
 
@@ -28,6 +32,9 @@ export default function AdminAiBotsEditPage() {
     systemPrompt: "",
     threadTopics: "",
     allowedForums: "",
+    defaultForumSlug: "",
+    appendPartnerLinks: true,
+    digestSportKey: "",
     maxResponsesPerHour: 10,
     maxResponsesPerDay: 50,
     enabled: true,
@@ -57,6 +64,9 @@ export default function AdminAiBotsEditPage() {
           systemPrompt: bot.systemPrompt,
           threadTopics: threadStr,
           allowedForums: forumsStr,
+          defaultForumSlug: bot.defaultForumSlug ?? "",
+          appendPartnerLinks: bot.appendPartnerLinks ?? true,
+          digestSportKey: bot.digestSportKey ?? "",
           maxResponsesPerHour: bot.maxResponsesPerHour,
           maxResponsesPerDay: bot.maxResponsesPerDay,
           enabled: bot.enabled,
@@ -88,6 +98,9 @@ export default function AdminAiBotsEditPage() {
           systemPrompt: form.systemPrompt.trim(),
           threadTopics: threadTopics.length ? threadTopics : undefined,
           allowedForums: allowedForums.length ? allowedForums : undefined,
+          defaultForumSlug: form.defaultForumSlug.trim() || null,
+          appendPartnerLinks: form.appendPartnerLinks,
+          digestSportKey: form.digestSportKey.trim() || null,
           maxResponsesPerHour: form.maxResponsesPerHour,
           maxResponsesPerDay: form.maxResponsesPerDay,
           enabled: form.enabled,
@@ -157,6 +170,61 @@ export default function AdminAiBotsEditPage() {
             placeholder="bet-general, bet-sportsbooks (empty = all)"
             className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            Digest-only sport (optional)
+          </label>
+          <select
+            value={form.digestSportKey}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, digestSportKey: e.target.value }))
+            }
+            className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
+          >
+            <option value="">No — general forum bot (comments, replies, proactive)</option>
+            {SPORT_DIGEST_REGISTRY.map((r) => (
+              <option key={r.sportKey} value={r.sportKey}>
+                Yes — only daily {r.displayName} digest posts (no general forum automation)
+              </option>
+            ))}
+          </select>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Use this for a dedicated “poster” account per sport. Digest cron picks the bot whose key
+            matches the sport first; otherwise it uses a normal bot with Allowed forums.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            Default forum for proactive threads
+          </label>
+          <input
+            type="text"
+            value={form.defaultForumSlug}
+            onChange={(e) => setForm((f) => ({ ...f, defaultForumSlug: e.target.value }))}
+            placeholder="bet-general or sport-mlb"
+            className="mt-1 w-full rounded border border-slate-300 px-3 py-2"
+          />
+          <p className="mt-0.5 text-xs text-slate-500">
+            Used when the cron creates a proactive thread (empty = bet-general).
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="appendPartnerLinks"
+            checked={form.appendPartnerLinks}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, appendPartnerLinks: e.target.checked }))
+            }
+            className="h-4 w-4 rounded border-slate-300"
+          />
+          <label htmlFor="appendPartnerLinks" className="text-sm text-slate-700">
+            Append partner sportsbook link block to comments
+          </label>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

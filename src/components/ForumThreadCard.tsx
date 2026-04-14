@@ -47,7 +47,7 @@ export function ForumThreadCard({ thread }: ForumThreadCardProps) {
   };
 
   return (
-    <article className="flex rounded-lg border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
+    <article className="flex rounded-none border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
       {/* Up/Down vote column - on the left (matches PostCard) */}
       <div className="flex w-10 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-slate-100 bg-slate-50/50 py-2">
         <button
@@ -90,7 +90,7 @@ export function ForumThreadCard({ thread }: ForumThreadCardProps) {
                 {thread.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600"
+                    className="rounded-none bg-slate-100 px-1.5 py-0.5 text-slate-600"
                   >
                     {tag}
                   </span>

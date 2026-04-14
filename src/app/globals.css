@@ -123,7 +123,7 @@ body {
     padding: 0.5rem 1rem;
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
-    border-radius: 0 0.5rem 0.5rem 0;
+    border-radius: 0;
     color: #334155;
     font-style: italic;
   }
@@ -141,7 +141,7 @@ body {
   .article-prose code {
     background-color: #f1f5f9;
     padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
+    border-radius: 0;
     font-size: 0.875rem;
     font-family: ui-monospace, monospace;
     color: #1e293b;
@@ -150,7 +150,7 @@ body {
   .article-prose pre {
     background-color: #0f172a;
     color: #f1f5f9;
-    border-radius: 0.5rem;
+    border-radius: 0;
     padding: 1rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -164,7 +164,7 @@ body {
   }
   .article-prose.prose img,
   .article-prose img {
-    border-radius: 0.5rem;
+    border-radius: 0;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     max-width: 100%;
     height: auto;
@@ -175,4 +175,12 @@ body {
     margin-bottom: 2rem;
     border-color: #e2e8f0;
   }
+}
+
+/* Inner forum routes (/f/*): square corners (sort tabs, CTAs, cards, tags, sidebar) */
+[data-forum-route],
+[data-forum-route] *,
+[data-forum-route] *::before,
+[data-forum-route] *::after {
+  border-radius: 0 !important;
 }

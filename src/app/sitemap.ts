@@ -25,27 +25,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: forum.category === "product" ? 0.9 : 0.85,
   }));
 
-  const posts = await prisma.post.findMany({
-    where: { status: "published" },
-    select: { slug: true, type: true, createdAt: true },
-  });
+  let dynamicRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await prisma.post.findMany({
+      where: { status: "published" },
+      select: { slug: true, type: true, createdAt: true },
+    });
 
-  const typeToPath: Record<string, string> = {
-    product: "products",
-    thread: "threads",
-    listicle: "listicles",
-    article: "articles",
-    bonus: "bonuses",
-  };
+    const typeToPath: Record<string, string> = {
+      product: "products",
+      thread: "threads",
+      listicle: "listicles",
+      article: "articles",
+      bonus: "bonuses",
+    };
 
-  const dynamicRoutes: MetadataRoute.Sitemap = posts
-    .filter((p) => typeToPath[p.type])
-    .map((p) => ({
-      url: `${base}/${typeToPath[p.type]}/${p.slug}`,
-      lastModified: p.createdAt ?? new Date(),
-      changeFrequency: p.type === "article" ? ("daily" as const) : ("weekly" as const),
-      priority: p.type === "product" || p.type === "article" ? 0.9 : 0.8,
-    }));
+    dynamicRoutes = posts
+      .filter((p) => typeToPath[p.type])
+      .map((p) => ({
+        url: `${base}/${typeToPath[p.type]}/${p.slug}`,
+        lastModified: p.createdAt ?? new Date(),
+        changeFrequency: p.type === "article" ? ("daily" as const) : ("weekly" as const),
+        priority: p.type === "product" || p.type === "article" ? 0.9 : 0.8,
+      }));
+  } catch {
+    // DB unavailable — return static routes only
+  }
 
   return [...staticRoutes, ...forumRoutes, ...dynamicRoutes];
 }

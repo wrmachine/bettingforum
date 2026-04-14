@@ -11,19 +11,7 @@ import { getBaseUrl } from "@/lib/base-url";
 import { SchemaJsonLd } from "@/components/SchemaJsonLd";
 import { extractShortcodeRefs } from "@/lib/shortcodes";
 import { resolveShortcodes } from "@/lib/shortcode-resolve";
-
-async function getArticle(slug: string) {
-  try {
-    const base = await getBaseUrl();
-    const res = await fetch(`${base}/api/posts/${slug}`, { cache: "no-store" });
-    if (!res.ok) return null;
-    const text = await res.text();
-    if (text.startsWith("<")) return null;
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
-}
+import { getPostBySlug } from "@/lib/post-data";
 
 export async function generateMetadata({
   params,
@@ -32,7 +20,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    const post = await getArticle(slug);
+    const post = await getPostBySlug(slug);
     if (!post || post.type !== "article") return {};
     const lead = post.article?.lead ?? post.excerpt ?? post.title;
     const path = `/articles/${slug}`;
@@ -63,29 +51,33 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getArticle(slug);
+  const post = await getPostBySlug(slug);
 
   if (!post || post.type !== "article") notFound();
 
   const refs = post.body ? extractShortcodeRefs(post.body) : [];
   const shortcodeData = refs.length > 0 ? await resolveShortcodes(refs) : null;
 
-  const base = await getBaseUrl();
-  const schemas = [];
-  const [articleEnabled, breadcrumbEnabled] = await Promise.all([
-    getSchemaEnabled("article"),
-    getSchemaEnabled("breadcrumb"),
-  ]);
-  if (articleEnabled)
-    schemas.push(buildArticleSchema({ ...post, createdAt: post.createdAt }));
-  if (breadcrumbEnabled) {
-    schemas.push(
-      buildBreadcrumbSchema([
-        { name: "Home", url: base },
-        { name: "Articles", url: `${base}/articles` },
-        { name: post.title, url: `${base}/articles/${post.slug}` },
-      ])
-    );
+  const schemas: unknown[] = [];
+  try {
+    const base = await getBaseUrl();
+    const [articleEnabled, breadcrumbEnabled] = await Promise.all([
+      getSchemaEnabled("article"),
+      getSchemaEnabled("breadcrumb"),
+    ]);
+    if (articleEnabled)
+      schemas.push(buildArticleSchema({ ...post, createdAt: post.createdAt }));
+    if (breadcrumbEnabled) {
+      schemas.push(
+        buildBreadcrumbSchema([
+          { name: "Home", url: base },
+          { name: "Articles", url: `${base}/articles` },
+          { name: post.title, url: `${base}/articles/${post.slug}` },
+        ])
+      );
+    }
+  } catch (err) {
+    console.error("ArticlePage schema error:", err);
   }
 
   return (
