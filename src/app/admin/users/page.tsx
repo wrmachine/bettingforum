@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UserDeleteButton } from "@/components/admin/UserDeleteButton";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
@@ -16,6 +17,15 @@ export default async function AdminUsersPage() {
       </div>
     );
   }
+
+  if (!result.session?.user?.id) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-700">
+        Session error
+      </div>
+    );
+  }
+  const currentUserId = result.session.user.id;
 
   const [users, counts] = await Promise.all([
     prisma.user.findMany({
@@ -42,10 +52,20 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
-      <p className="mt-2 text-slate-600">
-        View all users, change roles, and manage accounts.
-      </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
+          <p className="mt-2 text-slate-600">
+            View all users, add accounts, edit profiles and roles, or remove users.
+          </p>
+        </div>
+        <Link
+          href="/admin/users/new"
+          className="inline-flex shrink-0 items-center justify-center rounded-md bg-felt px-4 py-2 text-sm font-medium text-white hover:bg-felt/90"
+        >
+          Add user
+        </Link>
+      </div>
 
       {/* Summary */}
       <div className="mt-6 flex gap-4">
@@ -127,14 +147,27 @@ export default async function AdminUsersPage() {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/u/${user.username}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-felt hover:underline"
-                    >
-                      Profile
-                    </Link>
+                    <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+                      <Link
+                        href={`/admin/users/${user.id}/edit`}
+                        className="text-sm font-medium text-felt hover:underline"
+                      >
+                        Edit
+                      </Link>
+                      <Link
+                        href={`/u/${user.username}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-slate-600 hover:text-felt hover:underline"
+                      >
+                        Profile
+                      </Link>
+                      <UserDeleteButton
+                        userId={user.id}
+                        username={user.username}
+                        disabled={user.id === currentUserId}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -144,8 +177,8 @@ export default async function AdminUsersPage() {
       </div>
 
       <p className="mt-4 text-sm text-slate-500">
-        Run <code className="rounded bg-slate-100 px-1 py-0.5">node scripts/make-admin.js [email]</code> to
-        promote a user to admin.
+        To promote a user without using this UI, you can run{" "}
+        <code className="rounded bg-slate-100 px-1 py-0.5">node scripts/make-admin.js [email]</code>.
       </p>
     </div>
   );
